@@ -1,47 +1,92 @@
 {
-  "name": "dynagram",
-  "version": "0.0.1",
-  "description": "",
-  "main": "src/electron-start.js",
-  "directories": {
-    "test": "test"
-  },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "express": "^4.16.3",
-    "jquery-ui": "github:jquery/jquery-ui",
-    "material-ui": "^1.0.0-beta.44",
-    "mxgraph": "^3.9.3",
-    "querystring": "^0.2.0",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
-    "react-redux": "^5.0.7",
-    "react-scripts": "^1.1.4",
-    "recompose": "^0.27.0",
-    "redux": "^4.0.0",
-    "redux-connect": "^7.0.0",
-    "redux-thunk": "^2.2.0",
-    "socket.io": "^2.1.0"
-  },
-  "devDependencies": {
-    "electron": "1.8.6",
-    "electron-prebuilt": "^1.4.13"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test1": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "electron": "electron ."
-  },
+  "name": "codeflow",
+  "version": "1.0.0",
+  "description": "Document and Debug Platform.",
+  "license": "MIT",
+  "private": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reachui/dynagram.git"
+    "url": "https://github.com/valcas/codeflow.git"
   },
-  "author": "",
-  "license": "MIT",
+  "homepage": "",
   "bugs": {
-    "url": "https://github.com/reachui/dynagram/issues"
+    "url": "https://github.com/valcas/codeflow/issues"
   },
-  "homepage": "https://github.com/reachui/dynagram#readme"
+  "author": {
+    "name": "Val Cassidy",
+    "email": "val@codeumentus.com",
+    "url": "https://github.com/valcas"
+  },
+  "presets": [
+    "@babel/preset-es2017"
+  ],
+  "plugins": [
+    "transform-object-rest-spread"
+  ],
+  "keywords": [
+    "app",
+    "boilerplate",
+    "electron",
+    "open",
+    "open-source",
+    "postcss",
+    "react",
+    "reactjs",
+    "source",
+    "webpack"
+  ],
+  "engines": {
+    "node": ">=9.0.0",
+    "npm": ">=5.0.0",
+    "yarn": ">=1.0.0"
+  },
+  "main": "main.js",
+  "scripts": {
+    "prod": "webpack --mode production --config webpack.build.config.js && electron --noDevServer .",
+    "start": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js --mode development",
+    "build": "webpack --config webpack.build.config.js --mode production",
+    "package": "npm run build",
+    "postpackage": "electron-packager ./ --out=./builds"
+  },
+  "dependencies": {
+    "@material-ui/core": "^3.0.1",
+    "axios": "^0.18.0",
+    "copy-webpack-plugin": "^4.5.2",
+    "electron": "^2.0.3",
+    "jquery-ui": "^1.12.1",
+    "material-ui": "^0.20.2",
+    "mxgraph-js": "^1.0.1",
+    "querystring": "^0.2.0",
+    "raw-loader": "^0.5.1",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-redux": "^5.0.7",
+    "react-scripts": "^1.1.5",
+    "recompose": "^0.29.0",
+    "redux": "^4.0.0",
+    "redux-connect": "^8.0.0",
+    "redux-thunk": "^2.3.0",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.0.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-react": "^6.24.1",
+    "babili-webpack-plugin": "^0.1.2",
+    "css-loader": "^0.28.11",
+    "electron-packager": "^12.1.0",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.4.0",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-import": "^11.1.0",
+    "postcss-loader": "^2.1.5",
+    "postcss-nested": "^3.0.0",
+    "postcss-pxtorem": "^4.0.1",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.13.0",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
+  }
 }
