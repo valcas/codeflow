@@ -59,7 +59,7 @@ module.exports = {
     }),
 	new CopyWebpackPlugin([
 		{ from: 'src/static' }
-	]),	
+	]),
     new BabiliPlugin()
   ],
   stats: {
