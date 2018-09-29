@@ -150,6 +150,7 @@ const graphReducer = (state = initialState, action) => {
           var targetGraph = Object.assign({}, state.graphs[i], {});
           // var targetGraph = JSON.parse(JSON.stringify(state.graphs[i]));
           targetGraph.data = {};
+          targetGraph.filterdata = {};
           state.graphs[i] = targetGraph;
           // activegraph.graph = JSON.parse(JSON.stringify(targetGraph));
           activegraph.graph = Object.assign({}, targetGraph, {});
