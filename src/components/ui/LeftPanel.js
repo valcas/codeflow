@@ -76,9 +76,7 @@ class LeftPanel extends PureComponent {
             name = name[name.length - 1];
             name = name.split('.')[0];
             var graph = {xml:xml, file:file, name:name};
-            // me.loadGraphXML(xml);
             store.dispatch({type: 'LOAD_GRAPH', payload: {graph:graph}});
-            // store.dispatch({type: 'SET_ACTIVE_GRAPH', payload: {activegraph:{graph:graph}}});
         }
     });
 
@@ -98,6 +96,27 @@ class LeftPanel extends PureComponent {
 
   clear() {
     store.dispatch({type: 'CLEAR_GRAPH_DATA'});
+  }
+
+  saveSession() {
+    dialog.showSaveDialog({properties: ['saveFile']}, function (file) {
+      if (file !== undefined) {
+        if ( ! file.toUpperCase().endsWith(".JSON"))  {
+          file += ".json"
+        }
+        store.dispatch({type: 'SAVE_SESSION_DATA', payload: {filename:file}});
+      }
+    });
+  }
+
+  openSession() {
+
+    dialog.showOpenDialog({properties: ['openFile']}, function (file) {
+      if (file !== undefined) {
+        store.dispatch({type: 'RESTORE_SESSION_DATA', payload: {filename:file}});
+      }
+   });
+
   }
 
   render()  {
@@ -137,6 +156,8 @@ class LeftPanel extends PureComponent {
           </div>
           <div><Button className={classes.button} onClick={this.openDiagram}>Open Diagram</Button></div>
           <div><Button className={classes.button} onClick={this.clear}>Clear</Button></div>
+          <div><Button className={classes.button} onClick={this.saveSession}>Save Session</Button></div>
+          <div><Button className={classes.button} onClick={this.openSession}>Open Session</Button></div>
 
         </Drawer>
       </div>

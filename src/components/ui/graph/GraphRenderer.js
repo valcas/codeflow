@@ -8,15 +8,6 @@ import {connect} from 'react-redux'
 import compose from 'recompose/compose';
 import store from '../../redux/CodeflowStore';
 
-/*import {
-    mxClient,
-    mxGraph,
-    mxRubberband,
-    mxUtils,
-    mxEvent
-} from "mxgraph-js";
-*/
-
 const {remote} = window.require('electron');
 const {app, dialog} = window.require('electron').remote;
 
@@ -74,10 +65,7 @@ class GraphRenderer extends PureComponent {
 
     var _this = this;
     window.mxUtils.getAll(['./lib/mxGraph/styles/default.xml'], function(xhr) {
-    // window.mxUtils.getAll(['', '/lib/mxGraph/styles/default.xml'], function(xhr) {
-      // Adds bundle text to resources
       window.mxResources.parse(xhr[0].getText());
-      // Configures the default graph theme
       var themes = new Object();
       themes['default'] = xhr[0].getDocumentElement();
 
@@ -85,7 +73,6 @@ class GraphRenderer extends PureComponent {
       _this.graph = new window.mxGraph(anchor);
       _this.graph.setHtmlLabels(true);
       _this.graph.themes = themes;
-      // _this.graph.stylesheet
       var dec = new window.mxCodec(themes['default']);
       dec.decode(themes['default'], _this.graph.stylesheet);
 
@@ -103,23 +90,16 @@ class GraphRenderer extends PureComponent {
     this.addStencilSets();
 
     var doc = window.mxUtils.parseXml(xml);
-    // window.mxStencilRegistry.parseStencilSet(doc);
     var codec = new window.mxCodec(doc);
     var rootNode = doc.getElementsByTagName("root")[0];
     var elt = rootNode.firstChild;
     var cells = [];
-    var model = this.graph.getModel();
-    var parent = this.graph.getDefaultParent();
 
     while (elt != null){
 
       var dynId = null;
       var cell = codec.decodeCell(elt);
-      if ((cell.style) && (cell.style.indexOf('shape=') > -1)) {
-        // console.log(cell.style);
-        // var label = cell.value;
-        // cell = this.graph.createVertex(parent, null, label, cell.geometry.x, cell.geometry.y, cell.geometry.width, cell.geometry.height, cell.style);
-      }
+
       if (elt.nodeName == 'object')  {
         dynId = elt.getAttribute('codeflow-id');
         cell.setValue(elt.getAttribute('label'));
@@ -140,23 +120,6 @@ class GraphRenderer extends PureComponent {
   }
 
   addStencilSets() {
-
-    // var stencils = ['basic'];
-    //
-    // var req = window.mxUtils.load("lib/mxGraph/stencils/flowchart.xml");
-    // var root = req.getDocumentElement();
-    // var shape = root.firstChild;
-    // var packageName = 'mxgraph.flowchart';
-    //
-    // while (shape != null)
-    // {
-    //   if (shape.nodeType == window.mxConstants.NODETYPE_ELEMENT)
-    //   {
-    //     window.mxStencilRegistry.addStencil(packageName + '.' + shape.getAttribute('name').toLowerCase(), new window.mxStencil(shape));
-    //   }
-    //
-    //   shape = shape.nextSibling;
-    // }
 
     this.addStencilSet('arrows.xml', 'mxgraph.arrows');
     this.addStencilSet('basic.xml', 'mxgraph.basic');
@@ -213,5 +176,4 @@ function mapStateToProps(state) {
 }
 export default compose(
   connect(mapStateToProps, mapDispatchToProps)
-  // withStyles(styles)
 )(GraphRenderer);

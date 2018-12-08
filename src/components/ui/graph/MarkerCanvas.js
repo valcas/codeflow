@@ -15,11 +15,9 @@ class MarkerCanvas extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {markers:[]};
-    console.log(this.state);
   }
 
   cellReceived(id, cell)  {
-      console.log(cell.geometry);
 
       var style = {
         top: cell.geometry.y + offsetY + 5,

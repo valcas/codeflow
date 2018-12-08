@@ -1,3 +1,5 @@
+const fs = window.require('fs');
+
 const initialState = {
   graphs: [],
   acivegraph : null
@@ -12,7 +14,6 @@ const graphReducer = (state = initialState, action) => {
     case 'SET_ACTIVE_GRAPHINDEX':
       return {graphs:state.graphs, activegraph:{index:action.payload.activegraph, graph:state.graphs[action.payload.activegraph]}};
     case 'SET_GRAPH_CELLS':
-      console.log(action.payload);
       for (var i = 0; i < state.graphs.length; i++) {
         if (state.graphs[i].name === state.activegraph.graph.name)  {
           state.graphs[i].graphcells = action.payload.graphcells;
@@ -27,15 +28,12 @@ const graphReducer = (state = initialState, action) => {
       var diagramId = data.diagramid;
       var targetGraph = null;
       var stepid = action.payload.data.stepid;
-      //var activegraph = JSON.parse(JSON.stringify(state.activegraph));
-	  var activegraph = Object.assign({}, state.activegraph, {});
+	    var activegraph = Object.assign({}, state.activegraph, {});
 
       for (var i = 0; i < state.graphs.length; i++) {
         if (state.graphs[i].name === diagramId)  {
-          //var targetGraph = JSON.parse(JSON.stringify(state.graphs[i]));
-		  var targetGraph = Object.assign({}, state.graphs[i], {});
+    		  var targetGraph = Object.assign({}, state.graphs[i], {});
 
-          // var targetGraph = state.graphs[i];
           if (targetGraph.data == null)  {
             targetGraph.data = {};
           }
@@ -63,7 +61,6 @@ const graphReducer = (state = initialState, action) => {
       var processid = action.payload.processid;
 
       var filteredData = {};
-      //var activegraph = JSON.parse(JSON.stringify(state.activegraph));
       var activegraph = Object.assign({}, state.activegraph, {});
 
       for (var i = 0; i < state.graphs.length; i++) {
@@ -76,7 +73,6 @@ const graphReducer = (state = initialState, action) => {
             var stepData = graph.data[stepKeys[iStep]];
             for (var iItem = 0; iItem < stepData.length; iItem++)  {
               if (stepData[iItem].processid == processid) {
-                console.log(stepData[iItem]);
                 if (filteredData[stepKeys[iStep]] == null)  {
                   filteredData[stepKeys[iStep]] = [];
                 }
@@ -91,7 +87,6 @@ const graphReducer = (state = initialState, action) => {
           activegraph.graph.currentfilter = processid;
           graph.selectedresponse = 0;
           activegraph.graph.selectedresponse = 0;
-          // console.log(filteredData);
 
         }
 
@@ -106,9 +101,7 @@ const graphReducer = (state = initialState, action) => {
           if (state.graphs[i].name === state.activegraph.graph.name)  {
             var graph = state.graphs[i];
 
-            //var activegraph = JSON.parse(JSON.stringify(state.activegraph));
-            //var activegraph = JSON.parse(JSON.stringify(state.activegraph));
-			var activegraph = Object.assign({}, state.activegraph, {});
+      			var activegraph = Object.assign({}, state.activegraph, {});
             activegraph.graph.filterdata = activegraph.graph.data;
             graph.filterdata = activegraph.graph.data;
             activegraph.graph.currentfilter = null;
@@ -126,7 +119,6 @@ const graphReducer = (state = initialState, action) => {
         if (state.graphs[i].name === state.activegraph.graph.name)  {
           var graph = state.graphs[i];
 
-          //var activegraph = JSON.parse(JSON.stringify(state.activegraph));
           var activegraph = Object.assign({}, state.activegraph, {});
           activegraph.graph.filterdata = activegraph.graph.data;
           graph.filterdata = activegraph.graph.data;
@@ -143,16 +135,34 @@ const graphReducer = (state = initialState, action) => {
     case 'CLEAR_GRAPH_DATA':
 
       var activegraph = Object.assign({}, state.activegraph, {});
-      // var activegraph = JSON.parse(JSON.stringify(state.activegraph));
 
       for (var i = 0; i < state.graphs.length; i++) {
         if (state.graphs[i].name === state.activegraph.graph.name)  {
           var targetGraph = Object.assign({}, state.graphs[i], {});
-          // var targetGraph = JSON.parse(JSON.stringify(state.graphs[i]));
           targetGraph.data = {};
           targetGraph.filterdata = {};
           state.graphs[i] = targetGraph;
-          // activegraph.graph = JSON.parse(JSON.stringify(targetGraph));
+          activegraph.graph = Object.assign({}, targetGraph, {});
+        }
+      }
+      return {graphs:state.graphs, activegraph:activegraph};
+
+    case 'SAVE_SESSION_DATA':
+
+      fs.writeFileSync(action.payload.filename, JSON.stringify({name:state.activegraph.graph.name, data:state.activegraph.graph.data}), 'utf-8');
+
+    case 'RESTORE_SESSION_DATA':
+
+      var json = fs.readFileSync(action.payload.filename[0], 'utf-8');
+      var sessionData = JSON.parse(json);
+      var activegraph = Object.assign({}, state.activegraph, {});
+
+      for (var i = 0; i < state.graphs.length; i++) {
+        if (state.graphs[i].name === sessionData.name)  {
+          var targetGraph = Object.assign({}, state.graphs[i], {});
+          targetGraph.data = sessionData.data;
+          targetGraph.filterdata = sessionData.data;
+          state.graphs[i] = targetGraph;
           activegraph.graph = Object.assign({}, targetGraph, {});
         }
       }

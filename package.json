@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^3.0.1",
+    "@material-ui/icons": "^3.0.1",
     "axios": "^0.18.0",
     "copy-webpack-plugin": "^4.5.2",
     "electron": "^2.0.3",

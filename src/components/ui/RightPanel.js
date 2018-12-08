@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-// import Typography from 'material-ui/Typography';
 import Drawer from '@material-ui/core/Drawer';
 import compose from 'recompose/compose';
 import {connect} from 'react-redux'
 import store from '../redux/CodeflowStore';
-import FileStore from '../file/FileStore';
-import List, { ListItem, ListItemText } from 'material-ui/List';
+import TimeChartDialog from './dialog/TimeChartDialog';
+// import FileStore from '../file/FileStore';
+// import List, { ListItem, ListItemText } from 'material-ui/List';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Table from '@material-ui/core/Table';
@@ -19,6 +19,7 @@ import Paper from '@material-ui/core/Paper';
 
 import filterImage from '../../images/filter.svg';
 import filterRemoveImage from '../../images/filter-remove.svg';
+import timeChartImage from '../../images/timechart.svg';
 
 const {app, dialog} = window.require('electron').remote;
 const drawerWidth = 300;
@@ -76,9 +77,9 @@ class RightPanel extends PureComponent {
     this.id = 0;
     this.props = props;
 
-    this.state = {selectedresponse : null};
+    this.state = {selectedresponse : null, timeChartDialog:{open:false}};
     this.handleResponseChange = this.handleResponseChange.bind(this);
-
+    this.timeChartDialog = React.createRef();
   }
 
   handleResponseChange(event)  {
@@ -104,12 +105,12 @@ class RightPanel extends PureComponent {
     }
   }
 
-  createData(id, name, calories, fat, carbs, protein) {
-    return { id, name, calories, fat, carbs, protein };
+  showTimeGraph() {
+    this.setState({selectedresponse : null, timeChartDialog:{open:true, steps:this.getProcessSteps()}});
+
   }
 
   handleRowClick(index)  {
-    // this.setState({selectedresponseindex : index});
     store.dispatch({type: 'SET_SELECTED_RESPONSE', payload:index});
   }
 
@@ -119,12 +120,31 @@ class RightPanel extends PureComponent {
     } else {
       var tempDate = new Date(+date);
       return tempDate.getHours() + ":" + tempDate.getMinutes() + ":" + tempDate.getSeconds() + ":" + tempDate.getMilliseconds();
-      // return (new Date(+date)).toLocaleTimeString();
     }
+  }
+
+  getProcessSteps() {
+
+    var timechartData = [];
+    var graph = this.props.activegraph.graph;
+    var stepKeys = Object.keys(graph.data);
+
+    for (var iStep = 0; iStep < stepKeys.length; iStep++)  {
+      var stepData = graph.data[stepKeys[iStep]];
+      for (var iItem = 0; iItem < stepData.length; iItem++)  {
+        if (stepData[iItem].processid == graph.currentfilter) {
+          timechartData.push({stepname:stepKeys[iStep], stepinfo:stepData[iItem]});
+        }
+      }
+    }
+
+    return timechartData;
+
   }
 
   render()  {
 
+    var me = this;
     const { classes } = this.props;
 
     var data = []
@@ -134,17 +154,10 @@ class RightPanel extends PureComponent {
 
     var processId = this.getDataField(data, 'processid');
 
-    const data2 = [
-      this.createData(1, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-      this.createData(2, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-      // createData('Eclair', 262, 16.0, 24, 6.0),
-      // createData('Cupcake', 305, 3.7, 67, 4.3),
-      // createData('Gingerbread', 356, 16.0, 49, 3.9),
-    ];
-
     var renderInfo = {};
     renderInfo.filtericon = 'small-icon' + ((processId && ( ! this.props.activegraph.graph.currentfilter)) ? '' : ' icon-disabled');
     renderInfo.removefiltericon = 'small-icon' + ((processId && this.props.activegraph.graph.currentfilter) ? '' : ' icon-disabled');
+    renderInfo.timeGraphIcon = 'small-icon' + ((processId && this.props.activegraph.graph.currentfilter) ? '' : ' icon-disabled');
 
     return(
       <div className="right-panel">
@@ -191,6 +204,7 @@ class RightPanel extends PureComponent {
                   <div className="right-table-footer-icon-container">
                     <img className={renderInfo.filtericon} src={filterImage} onClick={() => {this.filterHandler(processId)}}/>
                     <img className={renderInfo.removefiltericon} src={filterRemoveImage} onClick={() => {this.removeFilterHandler(processId)}}/>
+                    <img className={renderInfo.timeGraphIcon} src={timeChartImage} onClick={() => {this.showTimeGraph(processId)}}/>
                   </div>
                 </div>
                 <div className="info-container-right-footer">
@@ -211,6 +225,7 @@ class RightPanel extends PureComponent {
             </div>
           </div>
         </Drawer>
+        <TimeChartDialog ref={me.timeChartDialog} state={this.state.timeChartDialog}/>
       </div>
     );
   }
