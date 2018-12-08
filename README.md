@@ -3,7 +3,7 @@ Cross Platform Doc &amp; Debug App
 <br><img src="screenshots/CustomerFlowSShot.png"/>
 
 Processing time charts
-<br><img src="screenshots/CustomerFlowSShot.png"/>
+<br><img src="screenshots/time-chart.png"/>
 
 <br><br>
 <a href="https://www.youtube.com/watch?v=6g2TkZi4shA">Introduction demo </a>
