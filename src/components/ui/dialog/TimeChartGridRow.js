@@ -64,8 +64,8 @@ export default class TimeChartGridRow extends PureComponent {
         var index = this.props.index;
         var top = 90 + (index * 30);
         return(
-            <div onMouseEnter={(e) => this.rowEnter(e)} onMouseLeave={(e) => this.rowExit(e)} className="timechart-grid-row" style={{height:'30px', width:'99%', position:'absolute', top:top + 'px'}}>
-                <canvas style={{width:'99%', height:'30px'}} ref={this.gridRow}></canvas>
+            <div onMouseEnter={(e) => this.rowEnter(e)} onMouseLeave={(e) => this.rowExit(e)} className="timechart-grid-row" style={{height:'30px', width:'99.99%', position:'absolute', top:top + 'px'}}>
+                <canvas style={{width:'100%', height:'30px'}} ref={this.gridRow}></canvas>
             </div>
         )
     

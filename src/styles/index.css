@@ -39,7 +39,7 @@ body {
 .timechart-stepcol {width:20%; border-bottom: 1px solid #CCC; padding:5px;}
 .timechart-timecol {min-width1:1px; border-bottom: 1px solid #CCC; background-color: #29ABE2; opacity:0.5}
 .timechart-padcol {border-bottom: 1px solid #CCC;}
-.timechart-gridparent {position:relative; height:100%}
+.timechart-gridparent {position:relative; height:100%; margin:5px}
 .timechart-gridelement {position:absolute; top:0px; left:0px; width:100%; height:100%}
 .timechart-tooltip-container {position:absolute; top:100px; display:none; left:230px; padding:10px; border-radius: 5px; border:1px solid #CCC; background-color: #EEE;}
 .timechart-grid-row:hover {background-color: #EEE; opacity:0.6}
