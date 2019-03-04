@@ -18,6 +18,7 @@ import FormControl from '@material-ui/core/FormControl';
 //import AccountCircle from '@material-ui/icons/AccountCircle';
 import playIcon from '../../images/play.svg';
 import stopIcon from '../../images/stop.svg';
+import deleteIcon from '../../images/delete.svg';
 import codeflowLogo from '../../images/codeflow-logo.svg';
 
 const {app, dialog} = window.require('electron').remote;
@@ -62,6 +63,7 @@ class LeftPanel extends PureComponent {
   constructor(props)  {
     super(props);
     this.props = props;
+    this.state = {searchText: ""};
   }
 
   openDiagram()  {
@@ -92,6 +94,16 @@ class LeftPanel extends PureComponent {
 
   handlePortChange(event)  {
     store.dispatch({type: 'SET_LISTENING_PORT', payload: event.target.value});
+  }
+
+  handleSearchChange(event)  {
+    store.dispatch({type: 'SET_SEARCH_TEXT', payload: event.target.value});
+    this.setState({searchText:event.target.value});
+  }
+
+  handleDeleteSearch(event)  {
+    store.dispatch({type: 'SET_SEARCH_TEXT', payload: ""});
+    this.setState({searchText:''});
   }
 
   clear() {
@@ -127,7 +139,6 @@ class LeftPanel extends PureComponent {
     var stopIconClass = 'port-icon' + (this.props.settings.listening ? '' : ' icon-disabled');
     var portInputDisabled = this.props.settings.listening ? true : false;
 
-//    <AccountCircle />
     return(
       <div>
         <Drawer variant="permanent" classes={{paper: classes.drawerPaper}}>
@@ -141,7 +152,7 @@ class LeftPanel extends PureComponent {
               <FormControl className={classes.margin} disabled={portInputDisabled}>
               <InputLabel htmlFor="input-with-icon-adornment">Listen Port</InputLabel>
               <Input
-              id="input-with-icon-adornment"
+              id="port-input"
               value={this.props.settings.listenport}
               onChange={(e) => {this.handlePortChange(e)}}
               />
@@ -154,10 +165,26 @@ class LeftPanel extends PureComponent {
               <img className={stopIconClass} src={stopIcon} onClick={this.handleStop}/>
             </div>
           </div>
-          <div><Button className={classes.button} onClick={this.openDiagram}>Open Diagram</Button></div>
-          <div><Button className={classes.button} onClick={this.clear}>Clear</Button></div>
-          <div><Button className={classes.button} onClick={this.saveSession}>Save Session</Button></div>
-          <div><Button className={classes.button} onClick={this.openSession}>Open Session</Button></div>
+          <div className="info-container">
+            <div><Button className={classes.button} onClick={this.openDiagram}>Open Diagram</Button></div>
+            <div><Button className={classes.button} onClick={this.clear}>Clear</Button></div>
+            <div><Button className={classes.button} onClick={this.saveSession}>Save Session</Button></div>
+            <div><Button className={classes.button} onClick={this.openSession}>Open Session</Button></div>
+            <br/>
+            <div>
+              <FormControl className={classes.margin}>
+              <Input
+                  id="filter-input"
+                  placeholder="Search..."
+                  onChange={(e) => {this.handleSearchChange(e)}}
+                  value={this.state.searchText}
+                  />
+              </FormControl>
+              <div className="info-prompt-block">
+                <img className="port-icon" src={deleteIcon} onClick={(e) => {this.handleDeleteSearch(e)}}/>
+              </div>
+             </div>
+           </div>
 
         </Drawer>
       </div>

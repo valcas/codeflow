@@ -5,6 +5,48 @@ const initialState = {
   acivegraph : null
 };
 
+const applyFilters = (state, processId, searchtext) => {
+
+  var returnState = Object.assign({}, state, {});
+
+  var activegraph = Object.assign({}, returnState.activegraph, {});
+  var targetGraph = returnState.graphs.filter(g => (g.name === returnState.activegraph.graph.name))[0];
+
+  if (targetGraph && targetGraph.data)  {
+
+    var stepKeys = Object.keys(targetGraph.data);
+    
+    var filteredData = {};
+
+    stepKeys.map(step => {
+      targetGraph.data[step].map(stepData => {
+
+        var addToResults = (processId == null) || (stepData.processid == processId);
+        addToResults = addToResults && ((searchtext == null) || (searchtext.trim().length === 0) || ((stepData.data) && (stepData.data.indexOf(searchtext) > -1)));
+
+        if (addToResults) {
+          if (filteredData[step] == null)  {
+            filteredData[step] = [];
+          }
+          filteredData[step].push(stepData);
+        }
+
+      });
+    });
+
+    targetGraph.filterdata = filteredData;
+    activegraph.graph.filterdata = filteredData;
+    targetGraph.currentfilter = processId;
+    activegraph.graph.currentfilter = processId;
+    targetGraph.selectedresponse = 0;
+    activegraph.graph.selectedresponse = 0;
+
+  }
+
+  return {graphs:returnState.graphs, activegraph:activegraph, selectedstep:returnState.selectedstep, searchtext:searchtext};
+
+};
+
 const graphReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_GRAPH':
@@ -20,10 +62,10 @@ const graphReducer = (state = initialState, action) => {
           state.activegraph.graph = state.graphs[i];
         }
       }
-      return {graphs:state.graphs, activegraph:state.activegraph};
+      return {graphs:state.graphs, activegraph:state.activegraph, searchtext:state.searchtext};
     case 'DATA_RECEIVED':
 
-	  state.activegraph = state.activegraph ? state.activegraph : {};
+	    state.activegraph = state.activegraph ? state.activegraph : {};
       var data = action.payload.data;
       var diagramId = data.diagramid;
       var targetGraph = null;
@@ -50,51 +92,22 @@ const graphReducer = (state = initialState, action) => {
           }
         }
       }
-      return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep};
+      return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep, searchtext:state.searchtext};
 
     case 'SET_SELECTED_STEP':
 
-      return {graphs:state.graphs, activegraph:state.activegraph, selectedstep:action.payload.selectedstep};
+      return {graphs:state.graphs, activegraph:state.activegraph, selectedstep:action.payload.selectedstep, searchtext:state.searchtext};
 
     case 'FILTER_PROCESS':
 
-      var processid = action.payload.processid;
+      return applyFilters(state, action.payload.processid, state.searchtext);  
 
-      var filteredData = {};
-      var activegraph = Object.assign({}, state.activegraph, {});
+    case 'SET_SEARCH_TEXT':
 
-      for (var i = 0; i < state.graphs.length; i++) {
-        if (state.graphs[i].name === state.activegraph.graph.name)  {
+      if ( ! state.activegraph) {return state;}
+      return applyFilters(state, state.activegraph.graph.currentfilter, action.payload);  
 
-          var graph = state.graphs[i];
-          var stepKeys = Object.keys(graph.data);
-
-          for (var iStep = 0; iStep < stepKeys.length; iStep++)  {
-            var stepData = graph.data[stepKeys[iStep]];
-            for (var iItem = 0; iItem < stepData.length; iItem++)  {
-              if (stepData[iItem].processid == processid) {
-                if (filteredData[stepKeys[iStep]] == null)  {
-                  filteredData[stepKeys[iStep]] = [];
-                }
-                filteredData[stepKeys[iStep]].push(stepData[iItem]);
-              }
-            }
-          }
-
-          graph.filterdata = filteredData;
-          activegraph.graph.filterdata = filteredData;
-          graph.currentfilter = processid;
-          activegraph.graph.currentfilter = processid;
-          graph.selectedresponse = 0;
-          activegraph.graph.selectedresponse = 0;
-
-        }
-
-      }
-
-      return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep};
-
-      case 'REMOVE_FILTER':
+    case 'REMOVE_FILTER':
 
         for (var i = 0; i < state.graphs.length; i++) {
 
@@ -107,27 +120,29 @@ const graphReducer = (state = initialState, action) => {
             activegraph.graph.currentfilter = null;
             graph.currentfilter = null;
 
-            return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep};
+            return applyFilters(state, state.activegraph.graph.currentfilter, state.searchtext);  
           }
 
         }
 
     case 'SET_SELECTED_RESPONSE':
 
-      for (var i = 0; i < state.graphs.length; i++) {
+    var returnState = Object.assign({}, state, {});
 
-        if (state.graphs[i].name === state.activegraph.graph.name)  {
-          var graph = state.graphs[i];
+    for (var i = 0; i < returnState.graphs.length; i++) {
+        
+        if (returnState.graphs[i].name === returnState.activegraph.graph.name)  {
+          
+          var filterResults = applyFilters(returnState, returnState.activegraph.graph.currentfilter, returnState.searchtext);            
+          var graph = filterResults.graphs[i];
 
-          var activegraph = Object.assign({}, state.activegraph, {});
-          activegraph.graph.filterdata = activegraph.graph.data;
-          graph.filterdata = activegraph.graph.data;
+          var activegraph = Object.assign({}, filterResults.activegraph, {});
           activegraph.graph.currentfilter = null;
           graph.currentfilter = null;
           activegraph.graph.selectedresponse = action.payload;
           graph.selectedresponse = action.payload;
-
-          return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep};
+          
+          return {graphs:filterResults.graphs, activegraph:activegraph, selectedstep:filterResults.selectedstep, searchtext:filterResults.searchtext};
         }
 
       }
@@ -145,7 +160,7 @@ const graphReducer = (state = initialState, action) => {
           activegraph.graph = Object.assign({}, targetGraph, {});
         }
       }
-      return {graphs:state.graphs, activegraph:activegraph};
+      return {graphs:state.graphs, activegraph:activegraph, searchtext:state.searchtext};
 
     case 'SAVE_SESSION_DATA':
 
@@ -166,7 +181,7 @@ const graphReducer = (state = initialState, action) => {
           activegraph.graph = Object.assign({}, targetGraph, {});
         }
       }
-      return {graphs:state.graphs, activegraph:activegraph};
+      return {graphs:state.graphs, activegraph:activegraph, searchtext:state.searchtext};
 
     default:
       return state;

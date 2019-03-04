@@ -152,6 +152,7 @@ class RightPanel extends PureComponent {
       data = this.props.activegraph.graph.filterdata[this.props.selectedstep];
     }
 
+    data = (data == null) ? [] : data;
     var processId = this.getDataField(data, 'processid');
 
     var renderInfo = {};

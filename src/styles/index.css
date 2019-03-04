@@ -16,6 +16,7 @@ body {
   border-left:1px solid #CCC}
 .info-container {display:table; margin:15px}
 .info-prompt {display:table-cell; margin:5px; vertical-align: middle;}
+.info-prompt-block {display:inline-block; margin:5px; vertical-align: middle;}
 .info-data {display:table-cell; margin:5px 5px 5px 15px; font-weight:bold; vertical-align: middle}
 .response-list {width:280px}
 .response-data {width:280px; height:400px}
