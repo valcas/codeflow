@@ -185,6 +185,11 @@ class LeftPanel extends PureComponent {
               </div>
              </div>
            </div>
+           <div className="info-container">
+              <a className="swagger-link" 
+                onClick={(e) => {window.open('http://localhost:8081/docs')}}
+              >API Documentation...</a>
+           </div>
 
         </Drawer>
       </div>

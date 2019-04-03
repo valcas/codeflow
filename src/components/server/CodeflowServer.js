@@ -7,55 +7,111 @@ class CodeflowServer extends Component {
 
   constructor(props) {
     super(props);
+    this.listening = false;
   }
 
   startListening()  {
-    this.http = window.require('http');
-    this.fs = window.require('fs');
-    this.querystring = window.require('querystring');
 
-    this.app = window.require('http').createServer(this.handler)
-    try {
-      this.app.listen(this.props.settings.listenport);
-    } catch (e) {
-      console.log('port in use');
-    } finally {
+    var _this = this;
 
+    if (this.listening === true) {
+      return;
     }
+    this.listening = true;
+
+    const bodyparser = require('body-parser');
+    const swaggerJSDoc = window.require('swagger-jsdoc');
+    const path = require('path');
+
+    var express = window.require('express');
+    this.app = express();
+    this.app.use(express.urlencoded());
+    this.app.use(bodyparser.json({
+      strict: false,
+    }));
+    
+/**
+ * @swagger
+ * /log:
+ *   post:
+ *     summary: Logger
+ *     description: Log a diagram trigger with data
+ *     tags:
+ *       - Logger
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               diagramid:
+ *                 type: string
+ *               stepid:
+ *                 type: string
+ *               action:
+ *                 type: string
+ *               processid:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *               timestamp:
+ *                 type: "integer"
+ *                 format: "int64"
+ *     responses:
+ *       200:
+ *         description: Nothing useful returned
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               default: 'Done'
+ */
+    this.app.post('/log', function (req, res) {
+
+      if (_this.listening === false) {
+        return;
+      }
+      
+      store.dispatch({type: 'DATA_RECEIVED', payload: {data:req.body}});
+      res.send('Done')
+
+    });
+     
+    this.server = this.app.listen(this.props.settings.listenport);
+
+    const swaggerDefinition = {
+      info: {
+        title: 'CodeFlow',
+        version: '1.2.0',
+        description: 'Codeflow Logging API',
+      },
+      host: 'localhost:8081',
+      basePath: '/',
+    };
+    const options = {
+      swaggerDefinition,
+      apis: [path.resolve('./src/components/server/', 'CodeflowServer.js')],
+    };
+    const swaggerSpec = swaggerJSDoc(options);
+
+    this.app.get('/swagger.json', (req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerSpec);
+    });
+
+    this.app.get('/docs', (req, res) => {
+      res.sendFile(path.resolve('docs', 'redoc.html'));
+    });
+    
   }
 
   stopListening()  {
-    this.app.close();
-    // this.app.exit();
-    // this.app = null;
-  }
 
-  handler(req, res)  {
+    this.listening = false;
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  	res.setHeader('Access-Control-Request-Method', '*');
-  	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-  	res.setHeader('Access-Control-Allow-Headers', '*');
-
-    var me = this;
-    var body = '';
-
-    res.writeHead(200);
-    res.end('done');
-
-    if (req.method == 'POST') {
-        body = '';
-    }
-
-    req.on('data', function (data) {
-        body += data;
-    });
-
-    req.on('end', function () {
-        var post = window.require('querystring').parse(body);
-        // var evt = new CustomEvent('datareceived', { detail: post });
-        // window.dispatchEvent(evt);
-        store.dispatch({type: 'DATA_RECEIVED', payload: {data:post}});
+    this.server.close(() => {
+      console.log('Process terminated')
     });
 
   }
@@ -83,5 +139,4 @@ function mapStateToProps(state) {
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps)
-  // withStyles(styles)
 )(CodeflowServer);
