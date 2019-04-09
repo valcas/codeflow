@@ -209,6 +209,10 @@ class RightPanel extends PureComponent {
                   </div>
                 </div>
                 <div className="info-container-right-footer">
+                  <div className="right-table-process-prompt">Keys:</div>
+                  <div className="info-data">keys</div>
+                </div>
+                <div className="info-container-right-footer">
                   <div className="right-table-process-prompt">Timestamp:</div>
                   <div className="info-data">{this.formatDate(this.getDataField(data, 'timestamp'))}</div>
                 </div>

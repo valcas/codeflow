@@ -25,10 +25,24 @@ class CodeflowServer extends Component {
 
     var express = window.require('express');
     this.app = express();
-    this.app.use(express.urlencoded());
+    this.app.use(express.json());
     this.app.use(bodyparser.json({
       strict: false,
     }));
+
+    this.app.all('*',function(req,res,next)
+    {
+        if (!req.get('Origin')) return next();
+    
+        res.set('Access-Control-Allow-Origin','*');
+        res.set('Access-Control-Allow-Methods','GET,POST');
+        res.set('Access-Control-Allow-Headers','X-Requested-With,Content-Type');
+    
+        if ('OPTIONS' == req.method) return res.send(200);
+        next();
+
+    });
+    
     
 /**
  * @swagger

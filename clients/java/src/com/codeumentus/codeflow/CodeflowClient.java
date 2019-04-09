@@ -6,16 +6,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CodeflowClient {
-	
-	public static void main(String[] args) {
-		CodeflowClient cfc = new CodeflowClient();
-		cfc.setCodeflowUrl("http://localhost:8081");
-		Double procid = (Math.random() * 10000);
-		cfc.sendTrigger("customer-flow", "check-form", String.valueOf(procid.intValue()), "test");
-	}
-	
+
 	private String codeflowUrl;	
 
 	public String getCodeflowUrl() {
@@ -26,28 +21,35 @@ public class CodeflowClient {
 		this.codeflowUrl = codeflowUrl;
 	}
 
-	public void sendTrigger(String diagramid, String stepname, String processid, String payload)	{
+	public void sendTrigger(String diagramid, String stepname, String processid, String payload, Map<String, String> keys)	{
 		
 		try {
 			
-			new Thread(new Runnable() {
-				
+			new Thread(new Runnable() {		
 			    public void run() {
 				
 					try {
 					
 						URL url = new URL(codeflowUrl);
 						HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+						String keysJson = keys.entrySet().stream()
+							.map(entry -> "{\"id\":\"" + entry.getKey() + "\", \"value\":\"" + entry.getValue() + "\"}")
+							.collect(Collectors.joining(",", "[", "]"));
+						
+						String urlParameters = "{" +
+								"\"diagramid\":\"" + diagramid + "\"," +
+								"\"stepid\":\"" + stepname + "\"," +
+								"\"action\":\"enter\"" + "," +
+								"\"processid\":\"" + processid + "\"," +
+								"\"data\":\"" + payload + "\"," +
+								"\"timestamp\":\"" + (new Date()).getTime() + "\"," +
+								"\"keys\":" + keysJson +
+								"}";
 			
-						String urlParameters = 
-								"diagramid=" + diagramid +
-								"&stepid=" + stepname +
-								"&action=enter" +
-								"&processid=" + processid +
-								"&data=" + payload +
-								"&timestamp=" + (new Date()).getTime();
-			
+						con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 						con.setDoOutput(true);
+						con.setDoInput(true);
 						con.setRequestMethod("POST");
 						DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 						wr.writeBytes(urlParameters);
@@ -62,7 +64,6 @@ public class CodeflowClient {
 					}
 					
 			    }
-
 			}).start();
 			
 		} catch (Exception e) {

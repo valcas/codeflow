@@ -52,3 +52,9 @@ ehthumbs.db
 # Windows shortcuts #
 #####################
 *.lnk
+/clients/scala/project
+/clients/scala/target
+/clients/scala/.idea
+/clients/target
+/clients/.idea
+/clients/project

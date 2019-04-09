@@ -22,7 +22,7 @@ function codeflowdef() {
     this.codeflowUrl = newurl;
   }
 
-  this.fire = function(diagramid, stepname, processid, payload) {
+  this.fire = function(diagramid, stepname, processid, payload, keys) {
 
     if ( ! this.codeflowUrl)  {
       return;
@@ -30,15 +30,19 @@ function codeflowdef() {
     var request = new XMLHttpRequest();
 
     request.open('POST', this.codeflowUrl);
-    request.setRequestHeader('Content-type','application/x-www-form-urlencoded; charset=utf-8');
-    request.send(
-      "diagramid=" + diagramid +
-      "&stepid=" + stepname +
-      "&action=" + "enter" +
-      "&processid=" + processid +
-      "&data=" + payload +
-      "&timestamp=" + new Date().getTime()
-    );
+    request.setRequestHeader('Content-type','application/json');
+
+    var payload = {
+      "diagramid" : diagramid,
+      "stepid" : stepname,
+      "action" : "enter",
+      "processid" : processid,
+      "data" : payload,
+      "timestamp" : new Date().getTime(),
+      "keys" : JSON.stringify(keys)
+    };
+
+    request.send(JSON.stringify(payload));
 
   }
 
