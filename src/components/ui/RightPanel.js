@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -6,8 +6,9 @@ import compose from 'recompose/compose';
 import {connect} from 'react-redux'
 import store from '../redux/CodeflowStore';
 import TimeChartDialog from './dialog/TimeChartDialog';
-// import FileStore from '../file/FileStore';
-// import List, { ListItem, ListItemText } from 'material-ui/List';
+
+import KeysComp from './components/KeysComp';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Table from '@material-ui/core/Table';
@@ -70,7 +71,7 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar,
 });
 
-class RightPanel extends PureComponent {
+class RightPanel extends Component {
 
   constructor(props)  {
     super(props);
@@ -154,11 +155,14 @@ class RightPanel extends PureComponent {
 
     data = (data == null) ? [] : data;
     var processId = this.getDataField(data, 'processid');
+    var currentfilter = this.getDataField(data, 'currentfilter');
+    var keys = this.getDataField(data, 'keys');
 
+    var hasProcessId = (processId && this.props.activegraph.graph.currentfilter && this.props.activegraph.graph.currentfilter.processid);
     var renderInfo = {};
-    renderInfo.filtericon = 'small-icon' + ((processId && ( ! this.props.activegraph.graph.currentfilter)) ? '' : ' icon-disabled');
-    renderInfo.removefiltericon = 'small-icon' + ((processId && this.props.activegraph.graph.currentfilter) ? '' : ' icon-disabled');
-    renderInfo.timeGraphIcon = 'small-icon' + ((processId && this.props.activegraph.graph.currentfilter) ? '' : ' icon-disabled');
+    renderInfo.filtericon = 'small-icon' + (hasProcessId ? ' icon-disabled' : '');
+    renderInfo.removefiltericon = 'small-icon' + (( ! hasProcessId) ? ' icon-disabled' : '');
+    renderInfo.timeGraphIcon = 'small-icon' + (( ! hasProcessId) ? ' icon-disabled' : '');
 
     return(
       <div className="right-panel">
@@ -168,7 +172,7 @@ class RightPanel extends PureComponent {
             </Toolbar>
           </AppBar>
           <div>
-            <div className="info-container">
+            <div className="info-container" style={{'marginTop':'20px'}}>
               <div className="info-prompt">Codeflow ID:</div>
               <div className="info-data">{this.props.selectedstep}</div>
             </div>
@@ -176,7 +180,7 @@ class RightPanel extends PureComponent {
               <div className="right-table-container">
                 <Table className={classes.table}>
                   <TableHead>
-                    <TableRow>
+                    <TableRow style={{height: '30px'}}>
                       <CustomTableCell>Request</CustomTableCell>
                       <CustomTableCell numeric>Process</CustomTableCell>
                     </TableRow>
@@ -185,7 +189,7 @@ class RightPanel extends PureComponent {
                     {data.map((cell, index) => {
                       var rowClass = (index == this.props.activegraph.graph.selectedresponse) ? 'selected-row' : '';
                       return (
-                        <TableRow className={rowClass} key={index} onClick={() => {this.handleRowClick(index)}}>
+                        <TableRow className={rowClass} key={index} onClick={() => {this.handleRowClick(index)}}  style={{height: '30px'}}>
                           <CustomTableCell component="th" scope="row">
                             {index}
                           </CustomTableCell>
@@ -210,7 +214,9 @@ class RightPanel extends PureComponent {
                 </div>
                 <div className="info-container-right-footer">
                   <div className="right-table-process-prompt">Keys:</div>
-                  <div className="info-data">keys</div>
+                  <div className="info-data">
+                    <KeysComp keys={keys} activegraph={this.props.activegraph}/>
+                  </div>
                 </div>
                 <div className="info-container-right-footer">
                   <div className="right-table-process-prompt">Timestamp:</div>
@@ -240,7 +246,6 @@ RightPanel.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-
 const mapDispatchToProps = (dispatch) => {
   return {};
 }
@@ -255,5 +260,3 @@ export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles)
 )(RightPanel);
-
-// export default withStyles(styles)(RightPanel);

@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <script src="codeflow.js"></script>
+    </head>
+    <div>
+        <!--input type="button" value="Start" onClick="start()"/ -->
+        <input type="button" value="Fire Thread" onClick="fireThread()"/>
+    </div>
+</html>
+<script>
+var flowTriggers = [
+    {"name":"check-form"}, {"name":"validate-form"}
+]
+var threadIndex = 0;
+var threadCount = 3;
+var processid = 0;
+
+var CODEFLOW_URL = "http://localhost:8081/log";
+codeflow.setUrl(CODEFLOW_URL);
+
+function startThread(procid) {
+
+    this.threadIndex = 0;
+    this.id = procid;
+    this.uuid = parseInt(Math.random() * 1000);
+    console.log("new thread: " + this.id + ":" + this.uuid);
+
+    this.run = function()  {
+
+        var _this = this;
+
+        if (running)    {
+            var keys = [];
+            keys.push({id:'threadkey1', value:parseInt(Math.random() * 1000)});
+            keys.push({id:'threadkey2', value:'keyvalue2'});
+            
+            flowTriggers.map((item) => {
+                console.log(this.id + ":" + this.uuid);
+                codeflow.fire("customer-flow", item.name, this.id, "test", keys);
+            });
+            
+            this.threadIndex++
+            if (this.threadIndex == threadCount) {
+                threadIndex = 0;
+            } else {
+                setTimeout(function(){_this.run()}, 500);
+            }
+        }
+
+    }
+
+    this.run(); 
+    
+}
+
+var running = false;
+function fireThread()    {
+    running = true;
+    new startThread(++processid);
+}
+function stop()    {
+    running = false;
+}
+</script>

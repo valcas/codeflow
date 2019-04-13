@@ -39,7 +39,7 @@ function codeflowdef() {
       "processid" : processid,
       "data" : payload,
       "timestamp" : new Date().getTime(),
-      "keys" : JSON.stringify(keys)
+      "keys" : keys
     };
 
     request.send(JSON.stringify(payload));

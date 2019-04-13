@@ -5,7 +5,19 @@ const initialState = {
   acivegraph : null
 };
 
-const applyFilters = (state, processId, searchtext) => {
+const getActiveFilters = (state) => {
+
+  var activegraph = Object.assign({}, state.activegraph, {});
+  
+  if ( ! activegraph.graph.currentfilter)  {
+    activegraph.graph.currentfilter = {};
+  }
+
+  return activegraph.graph.currentfilter;
+
+}
+
+const applyFilters = (state, filter) => {
 
   var returnState = Object.assign({}, state, {});
 
@@ -21,8 +33,29 @@ const applyFilters = (state, processId, searchtext) => {
     stepKeys.map(step => {
       targetGraph.data[step].map(stepData => {
 
-        var addToResults = (processId == null) || (stepData.processid == processId);
-        addToResults = addToResults && ((searchtext == null) || (searchtext.trim().length === 0) || ((stepData.data) && (stepData.data.indexOf(searchtext) > -1)));
+        var addToResults = (filter == null) || (filter.processid == null) || (stepData.processid == filter.processid);
+        addToResults = addToResults && ((filter == null) || (filter.searchtext == null) || (filter.searchtext.trim().length === 0) || ((stepData.data) && (stepData.data.indexOf(filter.searchtext) > -1)));
+        if (addToResults && (filter.keys) && (filter.keys.length > 0)) {
+          var keyMatch = false;
+          var stepkeys = stepData.keys ? stepData.keys : [];
+          stepkeys.map((key) => {
+            filter.keys.map((fKey) => {
+              if ((key.id === fKey.id) && (key.value === fKey.value))  {
+                keyMatch = true;
+              }
+            });
+          });
+
+          addToResults = addToResults && keyMatch;
+
+          // for (var i = 0; i < stepkeys.length; i++) {
+          //   if ((stepkeys[i].id === filter.key.id) && (stepkeys[i].value === filter.key.value))  {
+          //     break;
+          //   } else {
+          //     addToResults = false;
+          //   }
+          // }
+        }
 
         if (addToResults) {
           if (filteredData[step] == null)  {
@@ -36,14 +69,14 @@ const applyFilters = (state, processId, searchtext) => {
 
     targetGraph.filterdata = filteredData;
     activegraph.graph.filterdata = filteredData;
-    targetGraph.currentfilter = processId;
-    activegraph.graph.currentfilter = processId;
+    targetGraph.currentfilter = filter;
+    activegraph.graph.currentfilter = filter;
     targetGraph.selectedresponse = 0;
     activegraph.graph.selectedresponse = 0;
 
   }
 
-  return {graphs:returnState.graphs, activegraph:activegraph, selectedstep:returnState.selectedstep, searchtext:searchtext};
+  return {graphs:returnState.graphs, activegraph:activegraph, selectedstep:returnState.selectedstep};
 
 };
 
@@ -69,7 +102,7 @@ const graphReducer = (state = initialState, action) => {
       var data = action.payload.data;
       var diagramId = data.diagramid;
       var targetGraph = null;
-      var stepid = action.payload.data.stepid;
+      var stepid = data.stepid;
 	    var activegraph = Object.assign({}, state.activegraph, {});
 
       for (var i = 0; i < state.graphs.length; i++) {
@@ -83,7 +116,7 @@ const graphReducer = (state = initialState, action) => {
             targetGraph.data[stepid] = [];
           }
           var stepdata = targetGraph.data[stepid];
-          stepdata.push({action:data.action, processid:data.processid, data:data.data, timestamp:data.timestamp});
+          stepdata.push({action:data.action, processid:data.processid, data:data.data, timestamp:data.timestamp, keys:data.keys});
           state.graphs[i] = targetGraph;
           targetGraph.filterdata = stepdata;
           if (activegraph.graph.name === diagramId) {
@@ -100,12 +133,33 @@ const graphReducer = (state = initialState, action) => {
 
     case 'FILTER_PROCESS':
 
-      return applyFilters(state, action.payload.processid, state.searchtext);  
+      var filter = getActiveFilters(state);
+      filter.processid = action.payload.processid;
+      return applyFilters(state, filter, state.searchtext);  
+
+    case 'FILTER_KEY':
+
+      var filter = getActiveFilters(state);
+      filter.keys = filter.keys ? filter.keys : [];
+      filter.keys.push(action.payload.key);
+      return applyFilters(state, filter);  
+
+    case 'REMOVE_FILTER_KEY':
+
+      var filter = getActiveFilters(state);
+      filter.keys.map((key, index) => {
+        if ((key.id === action.payload.key.id) && (key.value === action.payload.key.value)) {
+          filter.keys.splice(index, 1);
+        }
+      });
+      return applyFilters(state, filter);  
 
     case 'SET_SEARCH_TEXT':
 
       if ( ! state.activegraph) {return state;}
-      return applyFilters(state, state.activegraph.graph.currentfilter, action.payload);  
+      var filter = getActiveFilters(state);
+      filter.searchtext = action.payload;
+      return applyFilters(state, filter);  
 
     case 'REMOVE_FILTER':
 
@@ -115,12 +169,14 @@ const graphReducer = (state = initialState, action) => {
             var graph = state.graphs[i];
 
       			var activegraph = Object.assign({}, state.activegraph, {});
+            var currentFilter = getActiveFilters(state);
+            currentFilter.processid = null;
             activegraph.graph.filterdata = activegraph.graph.data;
             graph.filterdata = activegraph.graph.data;
             activegraph.graph.currentfilter = null;
             graph.currentfilter = null;
 
-            return applyFilters(state, state.activegraph.graph.currentfilter, state.searchtext);  
+            return applyFilters(state, currentFilter);  
           }
 
         }
@@ -133,12 +189,13 @@ const graphReducer = (state = initialState, action) => {
         
         if (returnState.graphs[i].name === returnState.activegraph.graph.name)  {
           
-          var filterResults = applyFilters(returnState, returnState.activegraph.graph.currentfilter, returnState.searchtext);            
+          var activeFilters = getActiveFilters(state);
+          var filterResults = applyFilters(returnState,activeFilters);
           var graph = filterResults.graphs[i];
 
           var activegraph = Object.assign({}, filterResults.activegraph, {});
-          activegraph.graph.currentfilter = null;
-          graph.currentfilter = null;
+          activegraph.graph.currentfilter = activeFilters;
+          graph.currentfilter = activeFilters;
           activegraph.graph.selectedresponse = action.payload;
           graph.selectedresponse = action.payload;
           
