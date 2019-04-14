@@ -15,9 +15,9 @@ body {
 .right-panel {width:300px; position:absolute; left:calc(100% - 600px); top:0px; background: #FFF; height:100%;
   border-left:1px solid #CCC}
 .info-container {display:table; margin:7px}
-.info-prompt {display:table-cell; margin:5px; vertical-align: middle;}
-.info-prompt-block {display:inline-block; margin:5px; vertical-align: middle;}
-.info-data {display:table-cell; margin:5px 5px 5px 15px; font-weight:bold; vertical-align: middle}
+.info-prompt {display:table-cell; margin:5px; vertical-align: middle; font-family: "Roboto", "Helvetica", "Arial", sans-serif; color:#333333}
+.info-prompt-block {display:inline-block; margin:5px; vertical-align: middle; font-family: "Roboto", "Helvetica", "Arial", sans-serif;}
+.info-data {display:table-cell; margin:5px 5px 5px 15px; color:#29ABE2; vertical-align: middle}
 .response-list {width:280px}
 .response-data {width:280px; height:400px}
 .filter-link {text-decoration:underline; color:#66F; cursor:pointer}

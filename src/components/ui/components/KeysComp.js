@@ -90,7 +90,7 @@ const filterImages = {
                         {keys.map((key, index) => {
                             return (
                                 <tr key={index}>
-                                    <td className="keyscomp-detail-text">{key.id}: </td>
+                                    <td className="info-prompt keyscomp-detail-text">{key.id}: </td>
                                     <td className="keyscomp-detail-text">{key.value}</td>
                                     <td className="keyscomp-detail-text">
                                         <div className="keyscomp-icon-container">

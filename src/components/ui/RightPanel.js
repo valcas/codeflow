@@ -44,6 +44,7 @@ const styles = theme => ({
     position: 'relative',
     overflow: 'auto',
     maxHeight: 3630,
+    borderRadius: '0px'
   },
   listSection: {
     backgroundColor: 'inherit',
@@ -173,7 +174,7 @@ class RightPanel extends Component {
           </AppBar>
           <div>
             <div className="info-container" style={{'marginTop':'20px'}}>
-              <div className="info-prompt">Codeflow ID:</div>
+              <div className="info-prompt">Codeflow ID: </div>
               <div className="info-data">{this.props.selectedstep}</div>
             </div>
             <Paper className={classes.root}>
