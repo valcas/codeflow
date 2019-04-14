@@ -134,7 +134,7 @@ class RightPanel extends Component {
     for (var iStep = 0; iStep < stepKeys.length; iStep++)  {
       var stepData = graph.data[stepKeys[iStep]];
       for (var iItem = 0; iItem < stepData.length; iItem++)  {
-        if (stepData[iItem].processid == graph.currentfilter) {
+        if (stepData[iItem].processid == graph.currentfilter.processid) {
           timechartData.push({stepname:stepKeys[iStep], stepinfo:stepData[iItem]});
         }
       }
