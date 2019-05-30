@@ -1,16 +1,16 @@
-import '../styles/index.css';
+import '../styles/index.scss';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import {connect} from 'react-redux'
 import compose from 'recompose/compose';
-import GraphRenderer from './ui/graph/GraphRenderer';
-import LeftPanel from './ui/LeftPanel';
+import LeftPanel from './ui/left/LeftPanel';
+import RightPanel from './ui/right/RightPanel';
 import ScrollableTabsButtonAuto from './ui/graph/GraphTabs.js';
 import CodeflowServer from './server/CodeflowServer';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Settings from './data/Settings.js';
+
+import $ from 'jquery'; 
 
 const theme = createMuiTheme({
   palette: {
@@ -34,8 +34,6 @@ const theme = createMuiTheme({
 
 const styles = theme => ({
   root: {
-      // flexGrow: 1,
-      // height: 430,
       zIndex: 1,
       overflow: 'hidden',
       position: 'relative',
@@ -55,12 +53,48 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    new Settings();
+    this.settings = new Settings();
     this.props = props;
+    this.table = React.createRef();
+    this.leftPanel = React.createRef();
+    this.rightPanel = React.createRef();
+    this.leftResizer = React.createRef();
+    this.rightResizer = React.createRef();
   }
 
   componentDidMount(){
-    document.title = "codeflow";
+    document.title = "CodeFlow";
+    this.handleWindowSize();
+    this.resizeLeft({clientX:this.leftResizer.current.offsetLeft});
+    this.resizeRight({clientX:this.rightResizer.current.offsetLeft});
+  }
+
+  handleWindowSize()  {
+    
+    var _this = this;
+
+    $(window).resize((e) => {
+      _this.doResize(e)
+    });
+  }
+
+  doResize()  {
+    $(this.table.current).height($(window).height());
+  }
+
+  resizeLeft(e)  {
+    this.leftPanel.current.style.width = (e.clientX - 5) + 'px';
+    var leftPanelContent = $(this.table.current).find('#left-drawer-content');
+    leftPanelContent.width(e.clientX - 4);
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  resizeRight(e)  {
+    var width = $(window).width() - e.clientX;
+    this.rightPanel.current.style.width = width + 'px';
+    var rightPanelContent = $(this.table.current).find('#right-drawer-content');
+    rightPanelContent.width(width + 6);
+    window.dispatchEvent(new Event('resize'));
   }
 
   render()  {
@@ -72,10 +106,37 @@ class App extends Component {
          <div>
           <CodeflowServer/>
           <div className={classes.root}>
-            <div><LeftPanel/></div>
-            <main className="graph-container">
-              <ScrollableTabsButtonAuto/>
-            </main>
+            <table ref={this.table} style={{'width':'100%', 'height':'100%', 'borderCollapse': 'collapse', 'borderSpacing': '0px'}}>
+              <tbody>
+                <tr>
+                  <td valign="top" style={{width:'300px'}} ref={this.leftPanel}>
+                    <LeftPanel/>
+                  </td>
+                  <td valign="top" draggable="true" ref={this.leftResizer}
+                      onDragEnd={(e) => {this.resizeLeft(e)}}
+                      style={{width:'1px', borderLeft:'1px solid #BBB', position:'relative', cursor:'col-resize', height:'100%'}}>
+                      <div draggable="true" 
+                        onDragEnd={(e) => {this.resizeLeft(e)}}
+                        style={{backgroundColor1:'#f00', height:'100%', position:'absolute', left:'0px', width:'10px', zIndex:'100'}}>
+                      </div>
+                  </td>
+                  <td valign="top" style={{width:'calc(100% - 600px)', height:'100%', position:'relative'}} id="graph-content-cell">
+                    <ScrollableTabsButtonAuto/>
+                  </td>
+                  <td valign="top" draggable="true" ref={this.rightResizer}
+                      onDragEnd={(e) => {this.resizeRight(e)}}
+                      style={{width:'1px', borderLeft:'1px solid #BBB', position:'relative', cursor:'col-resize', height:'100%'}}>
+                      <div draggable="true" 
+                        onDragEnd={(e) => {this.resizeRight(e)}}
+                        style={{backgroundColor1:'#f00', height:'100%', position:'absolute', left:'-10px', width:'10px', zIndex:'100'}}>
+                      </div>
+                  </td>
+                  <td valign="top" style={{width:'300px', position:'relative'}} ref={this.rightPanel}>
+                    <RightPanel/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </MuiThemeProvider>

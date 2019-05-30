@@ -25,7 +25,7 @@ const filterImages = {
     remove : {image:filterRemoveImage, inverse:true}
 };
   
-  class KeysComp extends Component {
+class KeysComp extends Component {
 
     constructor(props)  {
         super();

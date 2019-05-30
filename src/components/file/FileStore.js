@@ -38,7 +38,7 @@ class FileStore {
     try {
       return fs.readFileSync(appPath, 'utf-8');
     } catch(e) {
-      console.log('Failed to save the file !\n\n' + e.message );
+      console.log('Failed to load the file !\n\n' + e.message );
     }
   }
 

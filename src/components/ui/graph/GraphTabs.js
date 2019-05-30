@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux'
+import compose from 'recompose/compose';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -7,8 +9,13 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import store from '../../redux/CodeflowStore';
 import GraphRenderer from './GraphRenderer';
-import {connect} from 'react-redux'
-import compose from 'recompose/compose';
+
+// import GraphFooter from './GraphFooter';
+
+import deleteIcon from '../../../images/delete.svg';
+import codeflowLogo from '../../../images/codeflow-logo.svg';
+
+import $ from 'jquery'; 
 
 function TabContainer(props) {
   return (
@@ -28,13 +35,22 @@ const styles = theme => ({
     width: '100%',
     backgroundColor: theme.palette.background.paper,
   },
+  button: {
+    minHeight:'35px',
+    textTransform: 'none',
+    minWidth:'auto'
+  },
+  tabs: {
+    minHeight:'35px'
+  }
 });
 
 class ScrollableTabsButtonAuto extends React.Component {
 
   constructor()	{
 	  super();
-	this.state = { activetab:0 };
+    this.state = { activetab:0 };
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event, value) {
@@ -79,11 +95,34 @@ class ScrollableTabsButtonAuto extends React.Component {
     var nodes = [];
 
     if ((this.props.activegraph != null) && (this.props.activegraph.graph != null)) {
-      nodes.push(<GraphRenderer key={this.props.activegraph.graph.name} graph={this.props.activegraph}/>);
+      nodes.push(
+        <div>
+          <GraphRenderer key={this.props.activegraph.graph.name} graph={this.props.activegraph}/>
+          {/* <GraphFooter/> */}
+        </div>
+      );
+    } else {
+      return (
+        <div style={{marginTop:'200px', textAlign:'center'}}>
+          <img style={{width:'50%'}} src={codeflowLogo}/>
+        </div>
+      );
     }
 
     return nodes;
 
+  }
+
+  handleTabMouseEnter(e)  {
+    $(e.currentTarget).find('.tab-close-icon').css('display', 'block');
+  }
+
+  handleTabMouseLeave(e)  {
+    $(e.currentTarget).find('.tab-close-icon').css('display', 'none');
+  }
+
+  handleTabCloseClick(n)  {
+    store.dispatch({type: 'CLOSE_GRAPH', payload: n.file});
   }
 
   render() {
@@ -97,20 +136,35 @@ class ScrollableTabsButtonAuto extends React.Component {
       this.state.activetab = this.props.activegraph.index;
     }
 
+    var scrollProp = this.graphs.length > 0 ? true : false;
+
     return (
-      <div className={classes.root}>
+      <div className={classes.root} style={{position:'absolute', left:'0px'}}>
         <AppBar position="static" color="default">
           <Tabs
             value={this.state.activetab}
             onChange={this.handleChange}
             indicatorColor="primary"
             textColor="primary"
-            scrollable
-            scrollButtons="auto"
+            scrollable={scrollProp}
+            scrollButtons={scrollProp}
+            className={classes.tabs}
           >
           return (
             {this.graphs.map(n => {
-                return <Tab key={n.name} label={n.name}/>;
+                return <Tab className={classes.button} key={n.name} 
+                  onMouseEnter={e => {this.handleTabMouseEnter(e);}} 
+                  onMouseLeave={e => {this.handleTabMouseLeave(e);}} 
+                  label={
+                    <div style={{display:'table'}}>
+                      <div style={{display:'table-cell'}}>
+                        {n.name}
+                      </div>
+                      <div className="tab-close-icon" style={{marginLeft:'10px', position:'absolute', display:'none'}}>
+                        <img src={deleteIcon} style={{width:'16px'}} onClick={() => {this.handleTabCloseClick(n)}}/>
+                      </div>
+                    </div>
+                }/>;
             })}
           );
           </Tabs>

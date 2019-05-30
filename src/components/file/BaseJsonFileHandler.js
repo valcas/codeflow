@@ -36,7 +36,8 @@ export default class BaseJsonFileHandler	{
 
 	setConfig(newConfig)	{
 		this.config = newConfig;
-		this.save();
+		var fileStore = new FileStore();
+		fileStore.setSettingsFile(this.configFile, JSON.stringify(newConfig));
 	}
 
 }

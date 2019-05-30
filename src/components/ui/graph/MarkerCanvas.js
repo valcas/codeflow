@@ -8,7 +8,7 @@ import store from '../../redux/CodeflowStore';
 import Badge from '@material-ui/core/Badge';
 import Zoom from '@material-ui/core/Zoom';
 
-const offsetY = 40;
+const offsetY = -5;
 
 class MarkerCanvas extends PureComponent {
 
@@ -20,7 +20,7 @@ class MarkerCanvas extends PureComponent {
   cellReceived(id, cell)  {
 
       var style = {
-        top: cell.geometry.y + offsetY + 5,
+        top: cell.geometry.y + offsetY,
         left: cell.geometry.x + 5
       }
 
@@ -30,22 +30,26 @@ class MarkerCanvas extends PureComponent {
       this.setState({markers:markers});
   }
 
-  getCell(stepid) {
+  getCell(stepid, stepdata, selected) {
     var cell = this.props.activegraph.graph.graphcells[stepid];
 
     if (cell != null) {
 
       var style = {
-        top: cell.geometry.y + offsetY + 5,
-        left: cell.geometry.x + 5
+        top: cell.geometry.y + offsetY,
+        left: cell.geometry.x - 5
       }
 
       var size = this.props.activegraph.graph.filterdata[stepid].length;
       const { checked } = false;
 
-      return <div className='marker-canvas' style={style}>
-          <Badge className="marker-basic" badgeContent={size} color="primary" children=""></Badge>
-      </div>
+      var marker = <BasicMarker style={style} badgeContent={size} stepdata={stepdata} selected={selected}/>
+      // var marker = 
+      // <div className='marker-canvas' style={style}>
+      //     <Badge className="marker-basic" badgeContent={size} color="primary" children=""></Badge>
+      // </div>
+
+      return marker;
 
     }
 
@@ -69,7 +73,7 @@ class MarkerCanvas extends PureComponent {
           {Object.keys(markerdata).map((cell, index) => {
             return (
                 <div key={cell} onClick={() => this.handleMarkerClick(cell)}>
-                  {me.getCell(cell)}
+                  {me.getCell(cell, markerdata[cell], (cell == me.props.selectedstep))}
                 </div>
             );
           })}

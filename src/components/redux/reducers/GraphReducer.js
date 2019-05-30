@@ -1,4 +1,5 @@
 const fs = window.require('fs');
+const JsonConfig = window.require('json-config/lib/json-config').default;
 
 const initialState = {
   graphs: [],
@@ -48,13 +49,6 @@ const applyFilters = (state, filter) => {
 
           addToResults = addToResults && keyMatch;
 
-          // for (var i = 0; i < stepkeys.length; i++) {
-          //   if ((stepkeys[i].id === filter.key.id) && (stepkeys[i].value === filter.key.value))  {
-          //     break;
-          //   } else {
-          //     addToResults = false;
-          //   }
-          // }
         }
 
         if (addToResults) {
@@ -80,6 +74,45 @@ const applyFilters = (state, filter) => {
 
 };
 
+const setSelectedStep = (state, targetGraph, stepname) =>  {
+
+  if (state.selectedstep) {
+    state.activegraph.graph.data[state.selectedstep].temp.selected = false;
+    if (state.activegraph.graph.filterdata[state.selectedstep].temp)  {
+      state.activegraph.graph.filterdata[state.selectedstep].temp.selected = false;
+    }
+  }
+  [targetGraph.data, targetGraph.filterdata].map(data => {
+    if (data) {
+      var targetStep = data[stepname];
+      targetStep.temp = targetStep.temp ? targetStep.temp : {}
+      targetStep.temp.selected = true;
+    }
+  })
+
+}
+
+const setSelectedProcess = (filterResults, selectedProcessId) => {
+
+  var dataKeys = Object.keys(filterResults.activegraph.graph.filterdata);
+
+  for (var i = 0; i < dataKeys.length; i++) {
+    var step = filterResults.activegraph.graph.filterdata[dataKeys[i]];
+    if (step.temp)  {
+      step.temp.selectedProcess = false;
+      step.temp.selected = false;
+    }
+    for (var x = 0; x < step.length; x++)  {
+      var event = step[x];
+      if (event.processid == selectedProcessId)  {
+        step.temp = step.temp ? step.temp : {};
+        step.temp.selectedProcess = true;
+      }
+    }
+  }
+
+}
+
 const graphReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_GRAPH':
@@ -96,6 +129,16 @@ const graphReducer = (state = initialState, action) => {
         }
       }
       return {graphs:state.graphs, activegraph:state.activegraph, searchtext:state.searchtext};
+    case 'CLOSE_GRAPH':
+        var tmp = Object.assign({}, state, {});
+        const jsonCfg = new JsonConfig(state);
+        let graphIdx = jsonCfg.getIndex(state.graphs, `graphs/[file=${action.payload}]`);
+        tmp.graphs.splice(graphIdx[0].index, 1);
+        if (tmp.activegraph.graph == graphIdx[0].node)  {
+          tmp.activegraph = null;
+        }
+        return tmp;
+
     case 'DATA_RECEIVED':
 
 	    state.activegraph = state.activegraph ? state.activegraph : {};
@@ -103,32 +146,36 @@ const graphReducer = (state = initialState, action) => {
       var diagramId = data.diagramid;
       var targetGraph = null;
       var stepid = data.stepid;
-	    var activegraph = Object.assign({}, state.activegraph, {});
+      var activegraph = Object.assign({}, state.activegraph, {});
+      
+      let cfg = new JsonConfig(state);
+      var tmp = cfg.getValue(`graphs/[name=${diagramId}]`)[0];
+      targetGraph = Object.assign({}, tmp, {});
 
-      for (var i = 0; i < state.graphs.length; i++) {
-        if (state.graphs[i].name === diagramId)  {
-    		  var targetGraph = Object.assign({}, state.graphs[i], {});
+      targetGraph.data = (targetGraph.data) ? targetGraph.data : {};
+      targetGraph.data[stepid] = targetGraph.data[stepid] ? targetGraph.data[stepid] : [];
 
-          if (targetGraph.data == null)  {
-            targetGraph.data = {};
-          }
-          if (targetGraph.data[stepid] == null)  {
-            targetGraph.data[stepid] = [];
-          }
-          var stepdata = targetGraph.data[stepid];
-          stepdata.push({action:data.action, processid:data.processid, data:data.data, timestamp:data.timestamp, keys:data.keys});
-          state.graphs[i] = targetGraph;
-          targetGraph.filterdata = stepdata;
-          if (activegraph.graph.name === diagramId) {
-            activegraph.graph.data = targetGraph.data;
-            activegraph.graph.filterdata = targetGraph.data;
-          }
-        }
+      var stepdata = targetGraph.data[stepid];
+      stepdata.temp = stepdata.temp ? stepdata.temp : {};
+      stepdata.temp.newdata = true;
+      stepdata.push({action:data.action, processid:data.processid, data:data.data, timestamp:data.timestamp, keys:data.keys});
+      state.graphs[i] = targetGraph;
+      targetGraph.filterdata = stepdata;
+      if (activegraph.graph.name === diagramId) {
+        activegraph.graph.data = targetGraph.data;
+        activegraph.graph.filterdata = targetGraph.data;
       }
+
+      if (state.activegraph.graph.selectedresponse != null) {
+        var procid = state.activegraph.graph.data[state.selectedstep][state.activegraph.graph.selectedresponse].processid;
+        setSelectedProcess({activegraph:activegraph}, procid);
+      }
+      setSelectedStep(state, activegraph.graph, state.selectedstep);
       return {graphs:state.graphs, activegraph:activegraph, selectedstep:state.selectedstep, searchtext:state.searchtext};
 
     case 'SET_SELECTED_STEP':
 
+      setSelectedStep(state, state.activegraph.graph, action.payload.selectedstep);
       return {graphs:state.graphs, activegraph:state.activegraph, selectedstep:action.payload.selectedstep, searchtext:state.searchtext};
 
     case 'FILTER_PROCESS':
@@ -183,24 +230,29 @@ const graphReducer = (state = initialState, action) => {
 
     case 'SET_SELECTED_RESPONSE':
 
-    var returnState = Object.assign({}, state, {});
+      var returnState = Object.assign({}, state, {});
 
-    for (var i = 0; i < returnState.graphs.length; i++) {
-        
-        if (returnState.graphs[i].name === returnState.activegraph.graph.name)  {
-          
-          var activeFilters = getActiveFilters(state);
-          var filterResults = applyFilters(returnState,activeFilters);
-          var graph = filterResults.graphs[i];
+      let cfg2 = new JsonConfig(returnState);
+      var filters = cfg2.getValue(`graphs/[name=${returnState.activegraph.graph.name}]`);
 
-          var activegraph = Object.assign({}, filterResults.activegraph, {});
-          activegraph.graph.currentfilter = activeFilters;
-          graph.currentfilter = activeFilters;
-          activegraph.graph.selectedresponse = action.payload;
-          graph.selectedresponse = action.payload;
-          
-          return {graphs:filterResults.graphs, activegraph:activegraph, selectedstep:filterResults.selectedstep, searchtext:filterResults.searchtext};
-        }
+      if (filters)  {
+
+        var activeFilters = getActiveFilters(state);
+        var filterResults = applyFilters(returnState,activeFilters);
+        var graph = filters[0];
+  
+        var activegraph = Object.assign({}, filterResults.activegraph, {});
+        activegraph.graph.currentfilter = activeFilters;
+        graph.currentfilter = activeFilters;
+        activegraph.graph.selectedresponse = action.payload;
+        graph.selectedresponse = action.payload;
+
+        var selectedProcessId = graph.data[state.selectedstep][action.payload].processid;
+
+        setSelectedProcess(filterResults, selectedProcessId);
+        setSelectedStep(state, filterResults.activegraph.graph, state.selectedstep);
+
+        return {graphs:filterResults.graphs, activegraph:activegraph, selectedstep:filterResults.selectedstep, searchtext:filterResults.searchtext};
 
       }
 
@@ -221,11 +273,14 @@ const graphReducer = (state = initialState, action) => {
 
     case 'SAVE_SESSION_DATA':
 
-      fs.writeFileSync(action.payload.filename, JSON.stringify({name:state.activegraph.graph.name, data:state.activegraph.graph.data}), 'utf-8');
+      var filepath = state.activegraph.graph.file;
+      filepath = action.payload.projectPath + '\\sessions\\' + action.payload.filename
+      fs.writeFileSync(filepath, JSON.stringify({name:state.activegraph.graph.name, data:state.activegraph.graph.data}), 'utf-8');
+      return state;
 
     case 'RESTORE_SESSION_DATA':
 
-      var json = fs.readFileSync(action.payload.filename[0], 'utf-8');
+      var json = fs.readFileSync(action.payload.filename, 'utf-8');
       var sessionData = JSON.parse(json);
       var activegraph = Object.assign({}, state.activegraph, {});
 

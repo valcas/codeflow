@@ -1,0 +1,85 @@
+$font-stack: "Roboto", "Helvetica", "Arial", sans-serif;
+$font-colour: #666666;
+$primary-colour: #29ABE2;
+$hi-colour:  #f6fdff;
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family:  "Roboto", "Helvetica", "Arial", sans-serif;
+  }
+  
+  .icon-toolbar {width: 100%; border-bottom:1px solid #EEE; height:35px}
+  .icon-toolbar-icon {margin:8px; opacity:0.5; cursor:pointer}
+  .icon-toolbar-icon:hover {opacity:1}
+  
+  .logo {position:absolute; top:0px}
+  .marker-canvas {position:absolute; width:30px; height:30px; top:0px; left:0px}
+  .marker-basic-container {cursor:pointer; padding-top:1px; text-align:center; font-weight:bold; font-family:arial;
+    border:2px solid #666; background-color: #009900; width:20px; height:20px;
+    position:absolute; border-radius1: 50%; opacity1: 0.5}
+  // .marker-basic {cursor:pointer; opacity: 0.9}
+  .marker-basic { -webkit-transition: background-color 100ms linear; cursor:pointer; opacity: 0.9; text-align: center; 
+      height: 25px; width: 25px; background-color: $primary-colour; border-radius: 50%; display: inline-block;}
+  .marker-basic-highlight {background-color: #AFA; }
+  .marker-basic-selected {border: 5px solid #FAA; top:-5px; left:-5px; position: absolute}
+  .marker-basic-selected-process {background-color: #A33; }
+  .marker-basic-text {padding-top:6px; color: #FFF; font-family:$font-stack; font-size:12px}
+  .graph-container {position:relative; overflow:auto; background:url('../images/grid.png'); top:5px; width:100%}
+  .graph-footer {height:35px; background:#FAFAFA; border-top:1px solid #DDD; position: absolute; width:100%}
+  .right-panel {width:300px; position:absolute; left:-3px; top:0px; background: #FFF; height:100%;}
+  .info-container {display:table; width:100%}
+  .info-prompt {display:table-cell; font-family:$font-stack; color:$font-colour; margin:5px; vertical-align: middle;}
+  .info-prompt-block {display:inline-block; margin:5px; vertical-align: middle;}
+  .info-data {display:table-cell; font-family:$font-stack; color:$font-colour; vertical-align: middle}
+  .info-data-white {display:table-cell; font-family:$font-stack; color:#FFF; font-weight: bold; vertical-align: middle}
+  .response-list {width:280px}
+  .response-data {width:280px; height:400px}
+  .filter-link {text-decoration:underline; color:#66F; cursor:pointer}
+  .port-icon {width:24px; height:24px; margin-left:5px; cursor:pointer}
+  .small-icon {width:16px; height:16px; margin-left:5px; cursor:pointer; display:inline-block; transition: transform 0.3s ease;}
+  .icon-disabled {opacity :0.2; cursor:default}
+  .selected-row {background:#EEE}
+  .info-container-right-footer {display:table; width:100%; margin:10px 0px 10px 0px}
+  .right-table-container {height:300px; overflow-y: scroll}
+  .right-table-footer {background:$primary-colour; display:table; width: 100%; vertical-align: middle;}
+  .right-table-footer-content {margin:6px; vertical-align: middle;}
+  .right-table-footer-icon-container {display:table-cell; width: 65px}
+  .right-table-process-prompt {display: table-cell; color:#FFF; width: 90px; margin:5px; vertical-align: top;}
+  .right-data-panel {font-family:$font-stack; color:$font-colour; height:100%; overflow:auto; word-wrap: break-word;}
+  .MuiTableRow-root-148 {height:28px}
+  .timechart-title {color: #29ABE2;; font-size:26px; padding-top:15px; text-align:center}
+  .timechart-table {border-collapse:collapse; margin-top: 50px; border-top: 1px solid #CCC}
+  .timechart-row {border-bottom:1px solid #CCC}
+  .timechart-row:hover {background-color:#DDD; opacity: 0.5;}
+  .timechart-stepcol {width:20%; border-bottom: 1px solid #CCC; padding:5px;}
+  .timechart-timecol {min-width1:1px; border-bottom: 1px solid #CCC; background-color: #29ABE2; opacity:0.5}
+  .timechart-padcol {border-bottom: 1px solid #CCC;}
+  .timechart-gridparent {position:relative; height:100%; margin:5px}
+  .timechart-gridelement {position:absolute; top:0px; left:0px; width:100%; height:100%}
+  .timechart-tooltip-container {position:absolute; top:100px; display:none; left:230px; padding:10px; border-radius: 5px; border:1px solid #CCC; background-color: #EEE;}
+  .timechart-grid-row:hover {background-color: #EEE; opacity:0.6}
+  .swagger-link {cursor:pointer; color:$primary-colour; margin-left:10px}
+  .keyscomp {display:flex}
+  .keyscomp-text {width:80%; display:inline-block}
+  .keyscomp-arrow {width:19%; display:inline-block}
+  .icon-rotate-90 {-webkit-transform: rotate(90deg); transition: transform 0.3s ease;}
+  .keyscomp-detail-panel {transition: transform 0.3s ease;}
+  .keyscomp-detail-panel-hidden {display:none; transition: transform 0.3s ease;}
+  .keyscomp-detail-text {width:40%; margin:3px; font-weight: normal;}
+  .keyscomp-icon-container {display:flex; width:26px;}
+  .keyscomp-icon {width:12px; height:12px; margin-left:5px; cursor:pointer; display:inline-block;}
+  .projects-tree {width:100%}
+  
+  .tree-project-container {height:500px; overflow-x: hidden; width:-webkit-fill-available}  
+  .tree-project-location {display:table; color:rgb(245, 245, 255); background-color: $primary-colour; 
+    cursor:pointer; font-family:$font-stack; border-bottom: 1px solid #FFF}
+  .tree-project-icon {width:20px}
+  .tree-project-project-icon {width:20px; display:none}
+  .tree-project-location:hover {background-color: rgb(98, 188, 226);}
+  .tree-project-arrow {display:table-cell; width:20px}
+//   .tree-project-location {display:table-cell; padding:5px}
+  .tree-project-file {padding:5px 5px 5px 25px; font-family:$font-stack; color:$font-colour; cursor:pointer}
+  .tree-project-file:hover {background-color: $hi-colour}
+  .tree-project-location-text {text-overflow: ellipsis; overflow: hidden; white-space: nowrap; 
+      width:245px; max-width:245px; padding:5px; display:table-cell}

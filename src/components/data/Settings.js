@@ -1,8 +1,5 @@
 import store from '../redux/CodeflowStore';
 import BaseJsonFileHandler from '../file/BaseJsonFileHandler.js';
-import FileStore from '../file/FileStore.js';
-import {connect} from 'react-redux'
-import compose from 'recompose/compose';
 
 const fs = window.require('fs');
 
@@ -17,6 +14,17 @@ export default class Settings extends BaseJsonFileHandler {
 
     store.dispatch({type: 'SETTINGS_LOADED', payload: this.config});
 
-	}
+    this.createSettingListener();
+
+  }
+  
+  createSettingListener() {
+
+    var _this = this;
+    window.addEventListener('settingChanged', function (e) { 
+      _this.setConfig(e.detail);
+    }, false);
+
+  }
 
 }

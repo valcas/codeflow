@@ -1,19 +1,13 @@
 import React, {PureComponent} from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
 import FileStore from '../../file/FileStore';
 import MarkerCanvas from './MarkerCanvas';
-import RightPanel from '../RightPanel';
 import {connect} from 'react-redux'
 import compose from 'recompose/compose';
 import store from '../../redux/CodeflowStore';
 
-const {remote} = window.require('electron');
-const {app, dialog} = window.require('electron').remote;
+const {dialog} = window.require('electron').remote;
 
 var electron = window.require('electron');
-
-var renderer;
 
 class GraphRenderer extends PureComponent {
 
@@ -26,6 +20,7 @@ class GraphRenderer extends PureComponent {
     });
 
     this.codeflowElements = {};
+    this.mainContent = React.createRef();
     this.markerCanvas = React.createRef();
 
     this.createListener();
@@ -35,10 +30,18 @@ class GraphRenderer extends PureComponent {
   createListener() {
 
     var me = this;
-    window.addEventListener('datareceived', function (e) {
-        me.handleData(e.detail)
-    });
 
+    window.onresize = function(event) {
+      me.handleResize();
+    };
+
+
+  }
+
+  handleResize()  {
+    var contentCell = document.getElementById('graph-content-cell');
+    var target = this.mainContent.current ? this.mainContent.current : this.mainContent;
+    target.style.height = (window.innerHeight - 42) + 'px';
   }
 
   handleData(data)  {
@@ -82,6 +85,8 @@ class GraphRenderer extends PureComponent {
       }
 
     });
+
+    window.setTimeout(() => {this.handleResize()}, 1);
 
   }
 
@@ -151,13 +156,12 @@ class GraphRenderer extends PureComponent {
     const { classes } = this.props;
 
     return (
-      <div>
-        <div ref={window.graphRenderer}>
-          <div id="graphContainer" className='graph-container'>
+      <div ref={this.mainContent} className='graph-container'>
+        <div>
+          <div ref={this.graphContainer} id="graphContainer">
         	</div>
         </div>
         <div><MarkerCanvas ref={this.markerCanvas}/></div>
-        <div><RightPanel/></div>
       </div>
     );
 
