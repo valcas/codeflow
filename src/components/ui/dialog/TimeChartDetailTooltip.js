@@ -30,18 +30,20 @@ export default class TimeChartDetailTooltip extends PureComponent {
         return(
             <div style={pStyle} className="timechart-tooltip-container">
                 <table>
-                <tr>
-                        <td className="info-prompt">Duration (seconds): </td>
-                        <td className="info-data">{(step.duration / 1000).toFixed(5)} s</td>
-                    </tr>
-                    <tr>
-                        <td className="info-prompt">Duration (percent): </td>
-                        <td className="info-data">{step.durationPercent.toFixed(5)} %</td>
-                    </tr>
-                    <tr>
-                        <td className="info-prompt">Timestamp: </td>
-                        <td className="info-data">{this.formatDate(step.stepinfo.timestamp)}</td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td className="info-prompt">Duration (seconds): </td>
+                            <td className="info-data">{(step.duration / 1000).toFixed(5)} s</td>
+                        </tr>
+                        <tr>
+                            <td className="info-prompt">Duration (percent): </td>
+                            <td className="info-data">{step.durationPercent.toFixed(5)} %</td>
+                        </tr>
+                        <tr>
+                            <td className="info-prompt">Timestamp: </td>
+                            <td className="info-data">{this.formatDate(step.stepinfo.timestamp)}</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         );

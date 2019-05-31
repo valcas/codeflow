@@ -21,7 +21,7 @@ body {
   // .marker-basic {cursor:pointer; opacity: 0.9}
   .marker-basic { -webkit-transition: background-color 100ms linear; cursor:pointer; opacity: 0.9; text-align: center; 
       height: 25px; width: 25px; background-color: $primary-colour; border-radius: 50%; display: inline-block;}
-  .marker-basic-highlight {background-color: #AFA; }
+  .marker-basic-highlight {background-color: #AFA; border: 5px solid #6A6; top:-5px; left:-5px; position: absolute}
   .marker-basic-selected {border: 5px solid #FAA; top:-5px; left:-5px; position: absolute}
   .marker-basic-selected-process {background-color: #A33; }
   .marker-basic-text {padding-top:6px; color: #FFF; font-family:$font-stack; font-size:12px}

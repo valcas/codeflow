@@ -577,7 +577,7 @@ else
 // Adds all required stylesheets and namespaces
 if (mxLoadStylesheets)
 {
-	mxClient.link('stylesheet', mxClient.basePath + '/css/common.css');
+	// mxClient.link('stylesheet', mxClient.basePath + '/css/common.css');
 }
 
 /**
@@ -44705,7 +44705,7 @@ mxPrintPreview.prototype.writeHead = function(doc, css)
 	}
 
 	// Adds all required stylesheets
-	mxClient.link('stylesheet', mxClient.basePath + '/css/common.css', doc);
+	// mxClient.link('stylesheet', mxClient.basePath + '/css/common.css', doc);
 
 	// Removes horizontal rules and page selector from print output
 	doc.writeln('<style type="text/css">');

@@ -96,7 +96,7 @@ class ScrollableTabsButtonAuto extends React.Component {
 
     if ((this.props.activegraph != null) && (this.props.activegraph.graph != null)) {
       nodes.push(
-        <div>
+        <div key={this.props.activegraph.graph.name}>
           <GraphRenderer key={this.props.activegraph.graph.name} graph={this.props.activegraph}/>
           {/* <GraphFooter/> */}
         </div>
@@ -147,16 +147,16 @@ class ScrollableTabsButtonAuto extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             scrollable={scrollProp}
-            scrollButtons={scrollProp}
+            scrollButtons="off"
             className={classes.tabs}
           >
           return (
-            {this.graphs.map(n => {
+            {this.graphs.map((n, index) => {
                 return <Tab className={classes.button} key={n.name} 
                   onMouseEnter={e => {this.handleTabMouseEnter(e);}} 
                   onMouseLeave={e => {this.handleTabMouseLeave(e);}} 
                   label={
-                    <div style={{display:'table'}}>
+                    <div key={index} style={{display:'table'}}>
                       <div style={{display:'table-cell'}}>
                         {n.name}
                       </div>

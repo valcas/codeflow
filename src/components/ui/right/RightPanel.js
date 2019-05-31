@@ -9,15 +9,11 @@ import StepEventDataPanel from './StepEventDataPanel';
 import TimeChartDialog from '../dialog/TimeChartDialog';
 import KeysComp from '../components/KeysComp';
 import InputDialog from '../dialog/InputDialog'
+import EventTable from './EventTable';
 
 import TextField from '@material-ui/core/TextField';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 
 import filterImage from '../../../images/filter.svg';
 import filterRemoveImage from '../../../images/filter-remove.svg';
@@ -28,18 +24,6 @@ import trashIcon from '../../../images/baseline-delete_forever-24px.svg';
 
 const JsonConfig = window.require('json-config/lib/json-config').default;
 const drawerWidth = 'calc(100% + 3px)';
-
-const CustomTableCell = withStyles(theme => ({
-  head: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    fontFamily : '"Roboto", "Helvetica", "Arial", sans-serif',
-    fontSize: 16
-  },
-  body: {
-  },
-}))(TableCell);
-
 
 const styles = theme => ({
   root: {
@@ -259,27 +243,7 @@ class RightPanel extends Component {
                       <div className="info-data" style={{height:'30px', padding:'0px 0px 0px 5px'}}>{this.props.selectedstep}</div>
                     </div>               
                     <div className="right-table-container">
-                      <Table className={classes.table}>
-                        <TableHead>
-                          <TableRow style={{height: '30px'}}>
-                            <CustomTableCell>Request</CustomTableCell>
-                            <CustomTableCell numeric>Process</CustomTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {data.map((cell, index) => {
-                            var rowClass = (index == this.props.activegraph.graph.selectedresponse) ? 'selected-row' : '';
-                            return (
-                              <TableRow className={rowClass} key={index} onClick={() => {this.handleRowClick(index)}}  style={{height: '30px'}}>
-                                <CustomTableCell component="th" scope="row">
-                                  {index}
-                                </CustomTableCell>
-                                <CustomTableCell numeric>{cell.processid}</CustomTableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
+                      <EventTable props={this.props} data={data} activegraph={this.props.activegraph} rowClickHandler={this.handleRowClick}/>
                     </div>
                     <div className="right-table-footer">
                       <div className="right-table-footer-content">

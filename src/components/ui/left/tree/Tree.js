@@ -87,13 +87,6 @@ export default class Tree extends Component {
         return ret;
     }
 
-    // getPanelContent(panel)  {
-    //     if (panel.expanded) {
-    //         // return panel.panel;
-    //         return <div>test</div>
-    //     }
-    // }
-
     handlePanelMouseEnter(e, panel) {
         if (panel.type == 'project')    {
             $(e.target).closest('.tree-project-location').find('.tree-project-project-icon').css('display', 'block');
@@ -115,23 +108,26 @@ export default class Tree extends Component {
 
     getFoldersPanel(panel)   {
         if (panel.expanded)  {
-            return (
-                <div>
-                    {this.createProjectPanel(panel.project)}
-                </div>
-            );
+            if (panel.type == 'permanent')  {
+                return (<div><SettingsPanel settings={this.props.settings}/></div>);
+            } else {
+                return (<div>{this.createProjectPanel(panel.project)}</div>);
+            }
         } else {
             return (<div></div>);
         }
     }
 
     handleFileClick(project, file)   {
-        console.log(project + ':' + file);
-        var path = project.location + '\\' + file.path;
-        var xml = new FileStore().getFile(path);
-        var name = file.path.split('.')[0];
-        var graph = {xml:xml, file:path, name:name};
-        store.dispatch({type: 'LOAD_GRAPH', payload: {graph:graph}});
+
+        if (file.type != 'folder')  {
+
+            var path = project.location + '\\' + file.path;
+            var xml = new FileStore().getFile(path);
+            var name = file.path.split('.')[0];
+            var graph = {xml:xml, file:path, name:name};
+            store.dispatch({type: 'LOAD_GRAPH', payload: {graph:graph}});
+        }
 
     }
 
@@ -139,9 +135,9 @@ export default class Tree extends Component {
 
         return (
             <div>
-                {project.files.map(file => {
+                {project.files.map((file, index) => {
                     return (
-                        <div>
+                        <div key={index}>
                             <div className="tree-project-file" onClick={() => {this.handleFileClick(project, file)}}>{file.path}</div>
                             {this.getSessionFiles(project, file)}
                         </div>
@@ -156,9 +152,9 @@ export default class Tree extends Component {
         if (folder.type == 'folder' && folder.key == 'sessions')  {
             return (
                 <div>
-                    {folder.files.map(file => {
+                    {folder.files.map((file, index) => {
                         return (
-                            <div className="tree-project-file" style={{display:'flex'}} 
+                            <div key={index} className="tree-project-file" style={{display:'flex'}} 
                                     onClick={() => {this.handleOpenSession(project, folder, file)}}>
                                 <img className="icon-toolbar-icon icon-rotate-90" src={sessionIcon} 
                                     style={{display:'inline-block', width:'20px', margin:'0px'}}/>
@@ -175,7 +171,6 @@ export default class Tree extends Component {
     }
 
     handleOpenSession(project, folder, file) {
-        console.log(file);
         store.dispatch({type: 'RESTORE_SESSION_DATA', payload: {filename:project.location + '\\sessions\\' + file}});
     }
 

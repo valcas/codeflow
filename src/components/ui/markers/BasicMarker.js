@@ -11,9 +11,14 @@ export default class BasicMarker extends PureComponent {
 
   componentDidMount(e) {
     $(this.marker.current).removeClass('marker-basic-highlight');
+    this.setStyles();
   }
 
   componentDidUpdate() {
+    this.setStyles();
+  }
+
+  setStyles() {
 
     var _this = this;
     var curr = $(this.marker.current);
@@ -45,8 +50,6 @@ export default class BasicMarker extends PureComponent {
       curr.removeClass('marker-basic-selected');
     }
     
-    console.log(this.props.stepdata.newdata);
-
   }
 
   render() {

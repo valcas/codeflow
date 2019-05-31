@@ -8,8 +8,5 @@ const reducers = combineReducers({
 });
 
 const store =  createStore(reducers);
-console.log(store.getState().validationsets);
 
 export default store;
-
-// export default store;

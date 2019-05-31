@@ -60,15 +60,16 @@ export default class TimeChartTimeGrid extends PureComponent {
         return(
             <div style={{height:'100%', width:'100%'}}>
                 <table ref={this.gridTable} style={{width:'100%', height:'90%', 'borderCollapse':'collapse'}}>
-                <tbody>
-                    <tr>
-                        <td style={{width:'100%', 'verticalAlign': 'top'}} ref={this.gridCanvasCell}>
-                        {stepdata.map((n, index) => {
-                            return <TimeChartGridRow parent={this} step={n} index={index} last={(index + 1) == stepdata.length} ref={(row) => {this.timeGridRows[index] = row}}/>
-                        })}
-                        </td>
-                    </tr>
-                </tbody>
+                    <tbody>
+                        <tr>
+                            <td style={{width:'100%', 'verticalAlign': 'top'}} ref={this.gridCanvasCell}>
+                            {stepdata.map((n, index) => {
+                                return <TimeChartGridRow parent={this} key={index} step={n} index={index} 
+                                    last={(index + 1) == stepdata.length} ref={(row) => {this.timeGridRows[index] = row}}/>
+                            })}
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
                 <TimeChartDetailTooltip ref={this.tooltipPopup}/>
            </div>
