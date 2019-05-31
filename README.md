@@ -6,11 +6,9 @@ Processing time charts
 <br><img src="screenshots/time-chart.png"/>
 
 <br><br>
-Introduction demo<br>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/m4dmMj3q8V8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<br>
-Process Isolation and Debug info demo<br>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/m4dmMj3q8V8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<a href="https://www.youtube.com/watch?v=6g2TkZi4shA&t=25s">Introduction demo</a>
+<br><br>
+<a href="https://www.youtube.com/watch?v=m4dmMj3q8V8&t=268s">Process Isolation and Debug info demo</a>
 <br><br>
 <a href="https://github.com/valcas/codeflow/releases">Download Installer</a>
 
