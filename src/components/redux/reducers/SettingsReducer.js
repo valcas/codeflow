@@ -31,6 +31,12 @@ const settingsReducer = (state = initialState, action) => {
       addMruItem(settings, project.location);
       saveSettings(settings);
       return {settings:settings};
+    case 'RELOAD_PROJECTS':
+      var settings = JSON.parse(JSON.stringify(state.settings));
+      settings.projects.map(proj => {
+        loadProjectFiles(proj);
+      });
+      return {settings:settings};
     case 'RELOAD_PROJECT':
 
         var settings = JSON.parse(JSON.stringify(state.settings));
@@ -81,9 +87,11 @@ const saveSettings = (settings) => {
 
 const loadProjectLocations = (settings) =>  {
 
-    settings.projects.map(project => {
-      loadProjectFiles(project);
-    });
+  settings.projects = settings.projects ? settings.projects : [];
+
+  settings.projects.map(project => {
+    loadProjectFiles(project);
+  });
 
 }
 

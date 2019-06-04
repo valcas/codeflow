@@ -5,7 +5,7 @@
 <style type="text/css">
 	.st0{fill:#4D4D4D;}
 	.st1{fill:#FFFFFF;}
-	.st2{fill:none;stroke:#FF0000;stroke-width:9;stroke-linecap:round;stroke-miterlimit:10;}
+	.st2{fill:none;stroke:#FF0000;stroke-width:3;stroke-linecap:round;stroke-miterlimit:10;}
 </style>
 <g>
 	<polygon fill="#FFFFFF" points="38.9,62 38.9,32.4 58.6,7.1 5,7.1 24.8,32.4 24.8,62 	"/>

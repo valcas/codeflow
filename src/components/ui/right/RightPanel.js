@@ -165,13 +165,17 @@ class RightPanel extends Component {
   }
 
   handleClearFilterClicked()  {
-    store.dispatch({type: 'SET_SEARCH_TEXT', payload: ''});
+    if (this.props.activegraph) {
+      store.dispatch({type: 'SET_SEARCH_TEXT', payload: ''});
+    }
   }
 
   handleSaveIconClicked() {
-    var tmp = Object.assign({}, this.state);
-    tmp.saveDialog.open = true;
-    this.setState(tmp);
+    if (this.props.activegraph) {
+      var tmp = Object.assign({}, this.state);
+      tmp.saveDialog.open = true;
+      this.setState(tmp);
+    }
   }
 
   handleSessionSave(file) {
@@ -185,7 +189,9 @@ class RightPanel extends Component {
   }
 
   handleClearSession()  {
-    store.dispatch({type: 'CLEAR_GRAPH_DATA'});
+    if (this.props.activegraph) {
+      store.dispatch({type: 'CLEAR_GRAPH_DATA'});
+    }
   }
 
   render()  {
@@ -206,9 +212,10 @@ class RightPanel extends Component {
 
     var hasProcessId = (processId && this.props.activegraph.graph.currentfilter && this.props.activegraph.graph.currentfilter.processid);
     var renderInfo = {};
-    renderInfo.filtericon = 'small-icon' + (hasProcessId ? ' icon-disabled' : '');
+    renderInfo.filtericon = 'small-icon' + (( ! this.props.activegraph) || (hasProcessId) ? ' icon-disabled' : '');
     renderInfo.removefiltericon = 'small-icon' + (( ! hasProcessId) ? ' icon-disabled' : '');
     renderInfo.timeGraphIcon = 'small-icon' + (( ! hasProcessId) ? ' icon-disabled' : '');
+    renderInfo.iconClass = this.props.activegraph ? 'icon-toolbar-icon' : 'icon-toolbar-icon-disabled';
 
     return(
       <div className="right-panel">
@@ -218,24 +225,25 @@ class RightPanel extends Component {
               <Toolbar>
               </Toolbar>
             </AppBar>
-            <table style={{height:'98%', width1:'300px', borderCollapse:'collapse', width:'100%'}}>
+            <table style={{height:'97%', width1:'300px', borderCollapse:'collapse', width:'100%'}}>
               <tbody>
                 <tr>
                   <td valign="top" style={{height:'50%'}}>
                     <div className="info-container-right-footer" style={{display:'table', margin:'0px 0px 0px 5px'}}>
                       <div style={{display:'table-cell'}}>
                         <TextField className={classes.filterText} id="txtFilter"
+                          disabled={ ! this.props.activegraph}
                           value={cfg.getValue('activegraph/graph/currentfilter/searchtext', '')}
                           onChange={(e) => {this.handleFilterTextChange(e)}}
                           label="Filter" margin="dense"/>
                       </div>
-                      <div className="icon-toolbar-icon" style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
+                      <div className={renderInfo.iconClass} style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
                         <img src={deleteIcon} style={{width:'24px'}} onClick={() => {this.handleClearFilterClicked()}}/>
                       </div>
-                      <div className="icon-toolbar-icon" style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
+                      <div className={renderInfo.iconClass} style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
                         <img src={saveIcon} onClick={() => {this.handleSaveIconClicked()}}/>
                       </div>
-                      <div className="icon-toolbar-icon" style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
+                      <div className={renderInfo.iconClass} style={{minWidth:'25px', display:'table-cell', verticalAlign:'bottom'}}>
                         <img src={trashIcon} onClick={() => {this.handleClearSession()}}/>                      
                       </div>
                     </div>

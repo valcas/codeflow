@@ -39,7 +39,7 @@ const applyFilters = (state, filter) => {
         var stepData = targetGraph.data[step][i];
       
         var addToResults = (filter == null) || (filter.processid == null) || (stepData.processid == filter.processid);
-        addToResults = addToResults && ((filter == null) || (filter.searchtext == null) || (filter.searchtext.trim().length === 0) || ((stepData.data) && (stepData.data.indexOf(filter.searchtext) > -1)));
+        addToResults = addToResults && ((filter == null) || (filter.searchtext == null) || (filter.searchtext.trim().length === 0) || ((stepData.data) && (new String(stepData.data).indexOf(filter.searchtext) > -1)));
         if (addToResults && (filter.keys) && (filter.keys.length > 0)) {
           var keyMatch = false;
           var stepkeys = stepData.keys ? stepData.keys : [];
@@ -109,11 +109,14 @@ const setSelectedResponse = (state, selectedstep) => {
   var currentProcessId = cfg.getValue(`activegraph/graph/filterdata/${state.selectedstep}/${state.activegraph.graph.selectedresponse}/processid`);
   var newStep = cfg.getValue(`activegraph/graph/filterdata/${selectedstep}`);
   state.activegraph.graph.selectedresponse = null;
-  newStep.map((event, index) => {
-    if (event.processid == currentProcessId)  {
-      state.activegraph.graph.selectedresponse = index;
-    }
-  });
+  
+  if (newStep)  {
+    newStep.map((event, index) => {
+      if (event.processid == currentProcessId)  {
+        state.activegraph.graph.selectedresponse = index;
+      }
+    });
+  }
 
   if (state.activegraph.graph.selectedresponse == null) {
     var isCurrent = cfg.getValue(`activegraph/graph/filterdata/${selectedstep}/temp/selectedProcess`);
@@ -238,7 +241,9 @@ const graphReducer = (state = initialState, action) => {
 
       var filter = getActiveFilters(state);
       filter.processid = action.payload.processid;
-      return applyFilters(state, filter, state.searchtext);  
+      var result = applyFilters(state, filter, state.searchtext);
+      setSelectedResponse(result, result.selectedstep);
+      return result;
 
     } else if (action.type == 'FILTER_KEY')  {
 
@@ -336,7 +341,7 @@ const graphReducer = (state = initialState, action) => {
 
         setSelectedProcess(filterResults, selectedProcessId);
         setSelectedStep(state, filterResults.activegraph.graph, state.selectedstep);
-
+        
         return {graphs:filterResults.graphs, activegraph:activegraph, selectedstep:filterResults.selectedstep, searchtext:filterResults.searchtext};
 
       }
@@ -359,7 +364,11 @@ const graphReducer = (state = initialState, action) => {
     } else if (action.type == 'SAVE_SESSION_DATA')  {
 
       var filepath = state.activegraph.graph.file;
-      filepath = action.payload.projectPath + '\\sessions\\' + action.payload.filename
+      filepath = action.payload.projectPath + '\\sessions';
+      if ( ! fs.existsSync(filepath)) {
+        fs.mkdirSync(filepath);
+      }
+      filepath += '\\' + action.payload.filename;
       fs.writeFileSync(filepath, JSON.stringify({name:state.activegraph.graph.name, data:state.activegraph.graph.data}), 'utf-8');
       return state;
 

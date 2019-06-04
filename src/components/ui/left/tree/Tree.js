@@ -17,9 +17,7 @@ export default class Tree extends Component {
         super(props);
         this.state = {
             panels:[
-                {type:'permanent', title:'Settings', background:'#333', icon:settingsIcon, iconClass:'tree-project-icon'
-                    // , panel:<SettingsPanel settings={this.props.settings}/>
-                }
+                {type:'permanent', title:'Settings', background:'#333', icon:settingsIcon, iconClass:'tree-project-icon'}
             ]
         }
         this.treeContainer = React.createRef();

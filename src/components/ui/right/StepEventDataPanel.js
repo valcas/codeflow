@@ -4,7 +4,9 @@ export default class StepEventDataPanel extends Component {
 
     getPayload()    {
         if (this.props.data)    {
-            if (this.props.data.startsWith('{'))    {
+            if (typeof(this.props.data) == 'object')    {
+                return JSON.stringify(this.props.data, null, 2);
+            } else if (typeof(this.props.data) == 'string' && (this.props.data.startsWith('{')))    {
                 var json = JSON.parse(this.props.data);
                 return JSON.stringify(json, null, 2);
             } else {
@@ -16,7 +18,7 @@ export default class StepEventDataPanel extends Component {
 
     render()    {
         return (
-            <div className="info-container">
+            <div className="info-container" style={{height:'100%'}}>
                 <div className="right-data-panel">
                     <pre style={{whiteSpace: 'pre-wrap'}}>
                         {this.getPayload()}

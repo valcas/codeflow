@@ -9,7 +9,7 @@ import Fade from '@material-ui/core/Fade';
 
 import store from '../../redux/CodeflowStore';
 
-import openIcon from '../../../images/baseline-folder-24px.svg';
+import refreshIcon from '../../../images/baseline-cached-24px.svg';
 
 const {app, dialog} = window.require('electron').remote;
 
@@ -92,30 +92,49 @@ export default class LeftToolbar extends PureComponent {
         });
     }
 
-    render()    {
-        
-        var mru = this.props.settings.mru ? this.props.settings.mru : [];
+    refreshProjects()   {
+        store.dispatch({type: 'RELOAD_PROJECTS'});
+    }
 
-        return (
-            <div className="icon-toolbar" style={{}}>
-                <Button aria-owns={open ? 'fade-menu' : undefined} aria-haspopup="true" onClick={(e) => {this.handleFileClick(e)}}>
-                    File...
-                </Button>
-                <Menu id="fade-menu" anchorEl={this.state.anchorEl} open={this.state.open}
-                    onClose={this.handleClose} TransitionComponent={Fade}>
-                    <MenuItem onClick={() => {this.openFolder()}}>Open Folder</MenuItem>
-                    <Divider />
-                    <MenuItem 
-                        onMouseEnter={(e) => {this.handleMruClick(e)}}
-                        // onMouseLeave={(e) => {this.closeMru(e)}}
-                    >Recent Folders</MenuItem>
-                </Menu>
+    getMruMenu()    {
+
+        var mru = this.props.settings.mru ? this.props.settings.mru : [];
+        
+        if (this.props.settings.mru)    {
+            return (
                 <StyledMenu id="mru-menu" anchorEl={this.state.anchorEl} open={this.state.mruopen}
                     onClose={this.handleClose} TransitionComponent={Fade}>
                     {mru.map((mruItem, index) => {                        
                         return <MenuItem onClick={() => {this.handleMruFileClick(mruItem)}} key={index}>{mruItem}</MenuItem>
                     })}
                 </StyledMenu>
+            );
+        }
+
+    }
+
+    render()    {
+        
+        return (
+            <div className="icon-toolbar" style={{display:'table'}}>
+                <div style={{width:'50%', display:'table-cell'}}>
+                    <Button aria-owns={open ? 'fade-menu' : undefined} aria-haspopup="true" onClick={(e) => {this.handleFileClick(e)}}>
+                        File...
+                    </Button>
+                    <Menu id="fade-menu" anchorEl={this.state.anchorEl} open={this.state.open}
+                        onClose={this.handleClose} TransitionComponent={Fade}>
+                        <MenuItem onClick={() => {this.openFolder()}}>Open Folder</MenuItem>
+                        <Divider />
+                        <MenuItem 
+                            onMouseEnter={(e) => {this.handleMruClick(e)}}
+                            // onMouseLeave={(e) => {this.closeMru(e)}}
+                            >Recent Folders</MenuItem>
+                    </Menu>
+                    {this.getMruMenu()}
+                </div>
+                <div style={{textAlign:'right', verticalAlign:'middle', display:'table-cell', paddingRight:'4px'}}>
+                    <img onClick={() => {this.refreshProjects()}} src={refreshIcon} className="icon-toolbar-icon" style={{margin:'0px', paddingTop: '7px'}}/>
+                </div>
             </div>
         )
     }

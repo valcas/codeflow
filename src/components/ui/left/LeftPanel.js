@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 
-import PropTypes from 'prop-types';
 import {connect} from 'react-redux'
 import compose from 'recompose/compose';
 
@@ -25,7 +24,9 @@ const styles = theme => ({
       height:36
   },
   toolbar: {
-    padding: 'unset'
+    padding: 'unset',
+    minHeight:'unset',
+    height:'10px'
   }
 });
 
@@ -48,8 +49,8 @@ class LeftPanel extends PureComponent {
     return(
       <Drawer variant="permanent" classes={{paper: classes.drawerPaper}}>
         <div id="left-drawer-content">
-          <AppBar className={classes.appbar} position="static" color="default">
-            <Toolbar className={classes.toolbar} >
+          <AppBar id="appbar" className={classes.appbar} position="static" color="default">
+            <Toolbar id="toolbar" className={classes.toolbar} >
               <img className="logo" style={{height:'30px', marginTop:'5px'}} src={codeflowLogo}/>
             </Toolbar>
           </AppBar>
